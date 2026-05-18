@@ -1,1897 +1,842 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script id="sagulife-v12-customer-early-flag">
-(function(){
-  try{
-    var p=new URLSearchParams(location.search);
-    if(p.get('view')==='customer'||p.get('customer')==='1'||p.get('display')==='customer'||p.get('preview')==='1'){
-      document.documentElement.classList.add('sagu-customer-view');
-    }
-  }catch(e){}
-})();
-</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SAGULIFE｜ノベルティ商談 発表者ビュー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS & RESET
+============================================================ */
+:root{
+  --bg:#040c1a;--panel-bg:#060e1e;--panel-border:rgba(0,212,168,.18);
+  --ink:#f1f5f9;--muted:#94a3b8;--line:rgba(255,255,255,.10);
+  --accent:#00D4A8;--amber:#FFB84D;--blue:#3b82f6;
+  --surface:rgba(255,255,255,.055);--surface2:rgba(255,255,255,.09);
+  --danger:#ff626a;--green:#39dd94;
+  --font-jp:'Noto Sans JP',sans-serif;--font-serif:'Noto Serif JP',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:var(--font-jp);color:var(--ink)}
+button{font:inherit;cursor:pointer}
 
-    <meta name="slides-format" content="viewport">
-    <title>SAGULIFE 商談プレゼン v8 WSE操作版｜台本連動プレゼン</title>
+/* ============================================================
+   LAYOUT — presenter split view
+============================================================ */
+#app{display:grid;grid-template-columns:minmax(540px,62vw) minmax(380px,38vw);width:100%;height:100vh;overflow:hidden}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+/* ---- left: preview pane ---- */
+.preview-pane{
+  position:relative;
+  border-right:1px solid var(--line);
+  background:#020811;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.preview-notice{
+  position:absolute;top:0;left:0;right:0;z-index:20;
+  padding:9px 18px;
+  background:rgba(4,12,26,.85);backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,.07);
+  font-size:11px;letter-spacing:.12em;font-weight:700;
+  color:rgba(255,255,255,.42);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.preview-notice span{color:var(--danger);font-size:10.5px}
+.slide-shell{
+  position:relative;
+  flex:1;
+  margin:38px 18px 14px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:6px;
+  overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,.6);
+}
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+/* iframe that holds the customer view */
+.slide-iframe{
+  width:100%;height:100%;
+  border:none;
+  display:block;
+  background:#040c1a;
+}
 
-    <style type="text/tailwindcss">
-        @theme {
-            --color-bg: #0a1020;
-            --color-bg-deep: #060c18;
-            --color-surface: #111827;
-            --color-text: #f1f5f9;
-            --color-text-secondary: #cbd5e1;
-            --color-text-muted: #94a3b8;
-            --color-accent-1: #00D4A8;
-            --color-accent-2: #FFB84D;
-            --color-accent-3: #3b82f6;
-            --color-glass-bg: rgba(255,255,255,0.06);
-            --color-glass-border: rgba(255,255,255,0.10);
-            --color-vignette: rgba(0,0,0,0.45);
-            --font-display: 'Noto Serif JP', serif;
-            --font-body: 'Noto Sans JP', sans-serif;
-        }
-    </style>
+/* Progress bar at bottom of preview */
+.preview-progress{
+  height:3px;
+  background:rgba(255,255,255,.07);
+  flex-shrink:0;
+}
+.preview-progress-fill{
+  height:100%;width:3.7%;
+  background:linear-gradient(90deg,var(--accent),var(--amber));
+  box-shadow:0 0 18px rgba(0,212,168,.55);
+  transition:width .3s ease;
+}
 
-    <style>
-        :root { --color-bg: #0a1020; --color-text: #f1f5f9; --glow-color-rgb: 0,212,168; }
-        *, *::before, *::after { box-sizing: border-box; }
-        html, body { background: var(--color-bg); margin: 0; }
-        body { font-family: var(--font-body); color: var(--color-text); overflow: hidden; height: 100vh; width: 100vw; }
-        .deck { width: 100vw; height: 100vh; position: relative; }
-        .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--color-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transform: scale(0.95); transition: opacity 0.7s ease, transform 0.7s ease; pointer-events: none; overflow: hidden; }
-        .slide.active { opacity: 1; transform: scale(1); pointer-events: all; }
-        .slide > .content { position: relative; z-index: 2; width: 100%; max-width: 1100px; padding: clamp(1.5rem, 4vw, 4rem); }
-        .nav-controls { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 16px; z-index: 100; background: var(--color-glass-bg); backdrop-filter: blur(10px); padding: 10px 24px; border-radius: 40px; border: 1px solid var(--color-glass-border); }
-        .nav-btn { width: 40px; height: 40px; border: none; background: var(--color-glass-bg); color: var(--color-accent-1); border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.3s; }
-        .nav-btn:hover { background: var(--color-glass-border); }
-        .slide-dots { display: flex; gap: 8px; }
-        .slide-dots .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--color-glass-border); cursor: pointer; transition: background 0.3s, transform 0.3s; }
-        .slide-dots .dot.active { background: var(--color-accent-1); transform: scale(1.3); }
-        .slide-counter { font-size: 0.8rem; color: var(--color-text-muted); min-width: 40px; text-align: center; }
-        .reveal { opacity: 0; transform: translateY(20px); }
-        .text-glow { text-shadow: 0 0 20px rgba(0,212,168,0.5), 0 0 40px rgba(0,212,168,0.2); }
-        .stat-glow { text-shadow: 0 0 30px rgba(0,212,168,0.6), 0 0 60px rgba(0,212,168,0.25); }
-        @keyframes glow-pulse {
-            0%, 100% { text-shadow: 0 0 20px rgba(0,212,168,0.5), 0 0 40px rgba(0,212,168,0.2); }
-            50% { text-shadow: 0 0 30px rgba(0,212,168,0.8), 0 0 60px rgba(0,212,168,0.3); }
-        }
-        .glow-pulse { animation: glow-pulse 3s ease-in-out infinite; }
-        @keyframes float-slow {
-            0% { transform: translate(0,0) scale(1); } 25% { transform: translate(60px,-50px) scale(1.12); }
-            50% { transform: translate(-40px,40px) scale(0.9); } 75% { transform: translate(50px,20px) scale(1.08); }
-            100% { transform: translate(0,0) scale(1); }
-        }
-        @keyframes float-drift {
-            0% { transform: translate(0,0) scale(1) rotate(0deg); } 33% { transform: translate(-50px,-60px) scale(1.15) rotate(3deg); }
-            66% { transform: translate(40px,30px) scale(0.88) rotate(-2deg); } 100% { transform: translate(0,0) scale(1) rotate(0deg); }
-        }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-        .gradient-mesh { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-        .blob { position: absolute; border-radius: 50%; filter: blur(80px); animation: float-slow 10s ease-in-out infinite; }
-        .blob:nth-child(2) { animation: float-drift 14s ease-in-out infinite; }
-        .blob:nth-child(3) { animation: float-slow 18s ease-in-out infinite reverse; }
-        .slide::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 256px 256px; opacity: 0.03; mix-blend-mode: overlay; }
-        .slide::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse at center, transparent 50%, var(--color-vignette) 100%); }
-        .q-badge { display: inline-block; background: rgba(0,212,168,0.15); border: 1px solid rgba(0,212,168,0.3); color: #00D4A8; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; padding: 4px 12px; border-radius: 20px; margin-bottom: 1rem; }
-        .section-label { font-size: 0.75rem; color: var(--color-text-muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.75rem; }
-        .accent-divider { width: 48px; height: 3px; background: linear-gradient(90deg, #00D4A8, #FFB84D); border-radius: 2px; margin: 1rem 0; }
-        .card-glass { background: rgba(255,255,255,0.06); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.10); border-radius: 16px; padding: 2rem; }
-        .card-accent { border-left: 4px solid #00D4A8; background: rgba(0,212,168,0.05); border-radius: 0 12px 12px 0; padding: 1.25rem 1.5rem; }
-        .card-amber { border-left: 4px solid #FFB84D; background: rgba(255,184,77,0.05); border-radius: 0 12px 12px 0; padding: 1.25rem 1.5rem; }
-        .big-question { font-family: 'Noto Serif JP', serif; font-size: clamp(2rem,5vw,3.8rem); font-weight: 900; line-height: 1.25; color: #0F172A; }
-        .big-question span { color: #00D4A8; }
-        .step-num { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg,#00D4A8,#3b82f6); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.85rem; color: #0a1020; flex-shrink: 0; }
-        .slide-dark-q { background: linear-gradient(135deg, #0a1020 0%, #0d1a2e 100%); }
-        .slide-light-q { background: linear-gradient(135deg, #e8f4f0 0%, #f0f7f5 100%); }
-        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; } }
-    </style>
+/* ---- right: script panel ---- */
+.panel{
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  background:linear-gradient(180deg,rgba(6,14,28,.98),rgba(4,9,18,.99));
+}
+.panel-head{
+  flex-shrink:0;
+  padding:18px 20px 14px;
+  border-bottom:1px solid rgba(0,212,168,.15);
+  position:relative;
+}
+.panel-head h1{font-size:20px;font-weight:900;letter-spacing:.01em;line-height:1.3}
+.panel-head p{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.6}
+.warn-banner{
+  margin:10px 0 0;padding:10px 13px;
+  border:1px solid rgba(255,98,106,.38);
+  background:rgba(255,98,106,.09);
+  color:#ffd0d3;font-size:12px;font-weight:700;line-height:1.55;
+  border-radius:6px;
+}
+.panel-body{flex:1;overflow-y:auto;padding:14px 18px 24px}
+.panel-body::-webkit-scrollbar{width:4px}
+.panel-body::-webkit-scrollbar-thumb{background:rgba(0,212,168,.25);border-radius:2px}
 
+/* Controls grid */
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px}
+.ctrl-btn{
+  border:1px solid rgba(255,255,255,.12);
+  background:var(--surface);
+  color:var(--ink);
+  padding:11px 12px;
+  border-radius:5px;
+  font-size:13px;font-weight:700;
+  transition:background .18s,border-color .18s;
+}
+.ctrl-btn:hover{background:var(--surface2);border-color:rgba(255,255,255,.22)}
+.ctrl-btn.primary{
+  background:linear-gradient(135deg,var(--amber) 0%,#c55a0a 100%);
+  border-color:rgba(255,180,77,.4);
+  color:#fff;
+}
+.ctrl-btn.primary:hover{filter:brightness(1.1)}
 
-    <style id="sagulife-presenter-v7-css">
-        /* v7 fallback utilities: the deck still uses Tailwind CDN, but these keep the file usable offline. */
-        .text-center{text-align:center}.font-display{font-family:'Noto Serif JP',serif}.grid{display:grid}.flex{display:flex}.items-center{align-items:center}.justify-center{justify-content:center}.flex-col{flex-direction:column}.gap-4{gap:1rem}.hidden{display:none!important}
-        .presenter-tools{position:fixed;right:22px;top:22px;z-index:160;display:flex;gap:10px;align-items:center;font-family:'Noto Sans JP',sans-serif}
-        .presenter-chip,.presenter-btn{border:1px solid rgba(255,255,255,.14);background:rgba(6,12,24,.56);backdrop-filter:blur(14px);color:#dbeafe;border-radius:999px;padding:9px 13px;font-size:12px;letter-spacing:.03em;box-shadow:0 10px 30px rgba(0,0,0,.22)}
-        .presenter-btn{cursor:pointer;color:#00D4A8;transition:transform .18s ease,background .18s ease,border-color .18s ease}.presenter-btn:hover{transform:translateY(-1px);background:rgba(0,212,168,.11);border-color:rgba(0,212,168,.35)}
-        .script-panel{position:fixed;top:82px;right:22px;width:min(430px,calc(100vw - 44px));max-height:calc(100vh - 145px);z-index:155;border:1px solid rgba(0,212,168,.22);border-radius:22px;background:linear-gradient(180deg,rgba(8,14,28,.92),rgba(6,12,24,.86));backdrop-filter:blur(18px);box-shadow:0 22px 70px rgba(0,0,0,.42);overflow:hidden;display:none;color:#e2e8f0;font-family:'Noto Sans JP',sans-serif}
-        .script-panel.open{display:block}.script-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:18px 18px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
-        .script-kicker{font-size:11px;color:#00D4A8;letter-spacing:.12em;font-weight:800}.script-title{font-family:'Noto Serif JP',serif;font-weight:900;font-size:18px;line-height:1.35;margin-top:4px;color:#f8fafc}.script-close{border:none;background:transparent;color:#94a3b8;font-size:24px;cursor:pointer;line-height:1}.script-close:hover{color:#fff}.script-body{padding:16px 18px 18px;overflow:auto;max-height:calc(100vh - 250px)}
-        .script-section{margin-bottom:14px}.script-label{font-size:11px;color:#94a3b8;letter-spacing:.1em;margin-bottom:6px;font-weight:800}.script-text{font-size:14px;line-height:1.9;color:#e5e7eb}.script-text.main{font-size:15px;color:#f8fafc}.script-alert{border-left:3px solid #FFB84D;background:rgba(255,184,77,.08);border-radius:0 12px 12px 0;padding:10px 12px;color:#fde68a}.script-safe{border-left:3px solid #00D4A8;background:rgba(0,212,168,.07);border-radius:0 12px 12px 0;padding:10px 12px;color:#ccfbf1}.script-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}.script-action{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#dbeafe;border-radius:12px;padding:8px 10px;font-size:12px;cursor:pointer}.script-action:hover{background:rgba(0,212,168,.10);color:#99f6e4;border-color:rgba(0,212,168,.28)}
-        .mini-progress{position:fixed;left:0;top:0;height:3px;background:linear-gradient(90deg,#00D4A8,#FFB84D);z-index:200;width:0%;transition:width .35s ease;box-shadow:0 0 20px rgba(0,212,168,.55)}
-        .blackout{position:fixed;inset:0;background:#020617;z-index:300;display:none;align-items:center;justify-content:center;color:#00D4A8;font-family:'Noto Serif JP',serif;font-size:clamp(2rem,6vw,5rem);font-weight:900}.blackout.on{display:flex}
-        .overview{position:fixed;inset:0;z-index:250;background:rgba(3,7,18,.93);backdrop-filter:blur(14px);display:none;overflow:auto;padding:34px}.overview.open{display:block}.overview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;max-width:1240px;margin:0 auto}.overview-card{border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(255,255,255,.06);padding:14px;min-height:118px;cursor:pointer;color:#e5e7eb}.overview-card:hover{border-color:#00D4A8;background:rgba(0,212,168,.10)}.overview-num{color:#00D4A8;font-size:12px;font-weight:900;margin-bottom:7px}.overview-title{font-family:'Noto Serif JP',serif;font-weight:800;font-size:15px;line-height:1.45}.overview-sub{font-size:11px;color:#94a3b8;margin-top:9px;line-height:1.55}.overview-close{position:fixed;right:28px;top:22px;border:none;background:rgba(255,255,255,.08);color:#e2e8f0;border-radius:999px;padding:10px 14px;cursor:pointer}
-        .help-pop{position:fixed;left:22px;top:22px;z-index:170;background:rgba(6,12,24,.72);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:13px 15px;color:#cbd5e1;font-size:12px;line-height:1.85;backdrop-filter:blur(14px);display:none}.help-pop.open{display:block}.help-pop b{color:#00D4A8}.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);z-index:260;background:rgba(6,12,24,.86);border:1px solid rgba(0,212,168,.26);color:#ccfbf1;border-radius:999px;padding:10px 15px;font-size:12px;opacity:0;pointer-events:none;transition:opacity .25s ease}.toast.show{opacity:1}
-        @media print{.nav-controls,.presenter-tools,.script-panel,.help-pop,.overview,.toast,.mini-progress{display:none!important}.slide{page-break-after:always;position:relative;opacity:1!important;transform:none!important;height:100vh}}
-    </style>
+/* Status block */
+.status-block{
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.04);
+  border-radius:6px;
+  padding:11px 13px;
+  margin-bottom:12px;
+  font-size:12.5px;
+  line-height:1.9;
+  color:var(--muted);
+}
+.status-block b{color:var(--amber)}
+.timer{font-size:20px;color:var(--green);font-weight:900;font-variant-numeric:tabular-nums}
 
+/* Cues list */
+.cues{display:flex;flex-direction:column;gap:10px}
+.cue{
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.04);
+  border-radius:8px;
+  padding:14px;
+  cursor:pointer;
+  transition:border-color .18s,background .18s,transform .15s;
+}
+.cue:hover{border-color:rgba(0,212,168,.35);transform:translateX(-2px)}
+.cue.active{
+  border-color:rgba(0,212,168,.65);
+  background:rgba(0,212,168,.09);
+  box-shadow:0 0 28px rgba(0,212,168,.1);
+}
+.cue-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
+.cue-no{color:var(--accent);font-weight:900;font-size:11px;letter-spacing:.12em}
+.cue-title{font-weight:900;font-size:15px;line-height:1.4}
+.cue-badge{
+  padding:5px 10px;flex-shrink:0;
+  border:1px solid rgba(0,212,168,.38);
+  background:rgba(0,212,168,.10);
+  color:var(--accent);
+  font-size:12px;font-weight:900;
+  border-radius:4px;
+}
+.sec{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06)}
+.lab{font-size:11px;color:#5d6e82;letter-spacing:.12em;font-weight:900;margin-bottom:5px}
+.txt{font-size:14px;line-height:1.85;color:var(--ink)}
+.txt.strong{font-size:16px;font-weight:900}
+.txt.script{font-size:13.5px;color:#d4e4f0;line-height:1.9}
+.txt.ask{color:#a9ffd7;font-weight:800;font-size:13.5px}
+.txt.avoid{color:#fde68a;font-size:13px;line-height:1.75}
+.txt.goal{color:#ccfbf1;font-size:13px;line-height:1.8}
 
+/* Keyboard shortcut hint */
+.kbd-hint{
+  text-align:center;padding:10px 0 0;
+  font-size:11px;color:rgba(255,255,255,.3);
+  letter-spacing:.06em;
+}
+.kbd-hint b{color:rgba(0,212,168,.6)}
 
-<style id="sagulife-wse-style-controls-css">
-  .wse-hash-chip{font-variant-numeric:tabular-nums;color:#00D4A8!important;border-color:rgba(0,212,168,.30)!important;background:rgba(0,212,168,.08)!important;min-width:58px;text-align:center;font-weight:800}
-  .wse-url-btn{color:#FFB84D!important}
-  .wse-mode-chip{color:#cbd5e1!important;background:rgba(255,255,255,.045)!important}
-  .wse-bottom-hint{position:fixed;left:22px;bottom:27px;z-index:120;display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(6,12,24,.56);backdrop-filter:blur(14px);box-shadow:0 12px 32px rgba(0,0,0,.24);font-family:'Noto Sans JP',sans-serif;font-size:12px;color:#94a3b8;letter-spacing:.02em;pointer-events:none}
-  .wse-bottom-hint b{color:#00D4A8;font-weight:900}.wse-bottom-hint .sep{width:1px;height:14px;background:rgba(255,255,255,.14)}
-  .wse-presenter-mode .script-panel{display:block}.wse-presenter-mode .script-panel:not(.open){display:block}.wse-presenter-mode .nav-controls{opacity:.72}.wse-presenter-mode .presenter-tools{right:22px}
-  @media (max-width:900px){.wse-bottom-hint{display:none}.presenter-tools{left:12px;right:auto;top:12px;max-width:calc(100vw - 24px);overflow-x:auto}.presenter-chip,.presenter-btn{white-space:nowrap}.script-panel{right:12px;top:70px;width:calc(100vw - 24px)}}
+/* Toast */
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:rgba(4,14,28,.9);border:1px solid rgba(0,212,168,.3);
+  color:#ccfbf1;border-radius:999px;padding:9px 16px;
+  font-size:12px;z-index:999;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.toast.show{opacity:1}
+
+/* Audience overlay controls (shown on audience page) */
+.aud-overlay{
+  position:fixed;right:16px;top:12px;z-index:60;
+  display:flex;gap:8px;
+  opacity:.12;transition:.18s;
+}
+.aud-overlay:hover{opacity:1}
+.aud-overlay button{
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(0,0,0,.5);
+  color:#fff;padding:7px 10px;
+  font-size:12px;font-weight:700;
+  border-radius:4px;
+}
+
+/* ============================================================
+   SLIDE STYLES — embedded iframe will use these via srcdoc
+============================================================ */
 </style>
-
-
-<style id="sagulife-v10-clean-main-css">
-  /* v10: main screen is always customer-facing. Notes exist only in the separate presenter window. */
-  .slide > .content{
-    width:min(1120px, calc(100vw - 120px));
-    max-width:1120px;
-    margin:0 auto;
-    padding:clamp(1.5rem, 4vw, 4rem);
-  }
-  .slide-focus-center > .content{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-  }
-  .slide-focus-center .section-label,
-  .slide-focus-center .q-badge{align-self:center;}
-  .slide-focus-center .accent-divider{margin-left:auto !important;margin-right:auto !important;}
-  .slide-focus-center p,
-  .slide-focus-center .big-question,
-  .slide-focus-center h2{max-width:900px;margin-left:auto;margin-right:auto;}
-  .slide-balanced > .content{width:min(1180px, calc(100vw - 120px));max-width:1180px;}
-  .slide-balanced .card-glass,
-  .slide-balanced .card-accent,
-  .slide-balanced .card-amber{height:100%;}
-
-  /* Absolute clean audience view: nothing except slide content is visible on the main screen. */
-  .presenter-tools,
-  .script-panel,
-  .wse-bottom-hint,
-  .help-pop,
-  .overview,
-  .toast,
-  .mini-progress,
-  .nav-controls,
-  .blackout{
-    opacity:0 !important;
-    visibility:hidden !important;
-    pointer-events:none !important;
-    display:none !important;
-  }
-  .script-panel.open,
-  .overview.open,
-  .help-pop.open,
-  .blackout.on{display:none !important;visibility:hidden !important;opacity:0 !important;}
-  body.wse-presenter-mode .script-panel,
-  body.wse-presenter-mode .nav-controls,
-  body.wse-presenter-mode .presenter-tools{display:none !important;visibility:hidden !important;opacity:0 !important;}
-
-  /* Keep clean balance on focus slides. */
-  .slide-focus-center .big-question{line-height:1.2;}
-  .slide-focus-center p{font-size:clamp(0.95rem, 1.25vw, 1.08rem) !important;line-height:1.9 !important;}
-
-  @media (max-width:1280px){
-    .slide > .content{width:min(1080px, calc(100vw - 76px));}
-    .slide-balanced > .content{width:min(1120px, calc(100vw - 76px));}
-  }
-  @media (max-width:900px){
-    .slide > .content,
-    .slide-balanced > .content{width:calc(100vw - 36px);}
-  }
-</style>
-
 </head>
 <body>
 
-<div class="mouse-spotlight" style="position:fixed;inset:0;z-index:99;pointer-events:none;"></div>
+<div class="toast" id="toast"></div>
 
-<div class="deck">
-
-    <!-- SLIDE 1: タイトル -->
-    <div class="slide slide-1 active slide-dark-q" data-slide="1">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:500px;height:500px;top:-100px;right:-100px;background:var(--color-accent-1);opacity:0.12;"></div>
-            <div class="blob" style="width:300px;height:300px;bottom:-80px;left:-60px;background:var(--color-accent-2);opacity:0.10;"></div>
-            <div class="blob" style="width:200px;height:200px;top:40%;left:15%;background:var(--color-accent-3);opacity:0.08;"></div>
-        </div>
-        <canvas class="particle-canvas" style="position:absolute;inset:0;z-index:1;"></canvas>
-        <div class="content text-center">
-            <div style="font-size:80px;margin-bottom:1.5rem;animation:float 3s ease-in-out infinite;" class="reveal">🎁</div>
-            <div class="section-label reveal" style="color:var(--color-accent-1);">株式会社SAGULIFE ／ 商談プレゼン</div>
-            <h1 class="font-display reveal" style="font-size:clamp(2.2rem,5.5vw,4.2rem);font-weight:900;background:linear-gradient(135deg,#00D4A8,#FFB84D);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2;margin-bottom:1rem;">
-                ブランドの世界観を、<br>1社で。
-            </h1>
-            <p class="reveal" style="font-size:clamp(0.9rem,1.5vw,1.2rem);color:var(--color-text-muted);letter-spacing:0.08em;">グッズ・ノベルティ制作企業の製造パートナー</p>
-            <div class="reveal" style="margin-top:2rem;display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;">
-                <div style="background:rgba(0,212,168,0.1);border:1px solid rgba(0,212,168,0.3);border-radius:8px;padding:0.5rem 1.2rem;font-size:0.85rem;color:#00D4A8;">最短3〜4日納品</div>
-                <div style="background:rgba(255,184,77,0.1);border:1px solid rgba(255,184,77,0.3);border-radius:8px;padding:0.5rem 1.2rem;font-size:0.85rem;color:#FFB84D;">他社が断る加工も対応</div>
-                <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);border-radius:8px;padding:0.5rem 1.2rem;font-size:0.85rem;color:#93c5fd;">チャット1本でリアルタイム連携</div>
-            </div>
-        </div>
+<div id="app">
+  <!-- LEFT: Slide Preview -->
+  <div class="preview-pane" id="previewPane">
+    <div class="preview-notice">
+      <span>発表者ビュー：この画面は共有しない</span>
+      <span>⚠ 顧客には「顧客表示を開く」で開いた別タブのみ共有</span>
     </div>
-
-    <!-- SLIDE 2: アイスブレイク Q.01 -->
-    <div class="slide slide-2 slide-light-q" data-slide="2">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:350px;height:350px;top:-60px;right:-60px;background:#00D4A8;opacity:0.06;"></div>
-            <div class="blob" style="width:200px;height:200px;bottom:-40px;left:-40px;background:#FFB84D;opacity:0.05;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:#64748b;">01　アイスブレイク</div>
-            <div class="q-badge reveal" style="background:rgba(0,212,168,0.1);color:#00897B;border-color:rgba(0,180,140,0.3);">Q.01</div>
-            <h2 class="big-question reveal">なぜ、<br>今このタイミングで<br><span>興味を持たれましたか?</span></h2>
-            <div class="accent-divider reveal"></div>
-            <p class="reveal" style="color:#475569;font-size:0.95rem;line-height:1.8;">先日のお電話でご興味をいただけた背景から伺えますでしょうか。<br>（相手の回答を受け、深掘りへ）</p>
-        </div>
+    <div class="slide-shell">
+      <iframe class="slide-iframe" id="slideFrame" title="スライドプレビュー"></iframe>
     </div>
+    <div class="preview-progress"><div class="preview-progress-fill" id="progressFill"></div></div>
+  </div>
 
-    <!-- SLIDE 3: アイスブレイク Q.02 -->
-    <div class="slide slide-3 slide-light-q" data-slide="3">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:300px;height:300px;top:-50px;right:-50px;background:#00D4A8;opacity:0.06;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:#64748b;">01　アイスブレイク</div>
-            <div class="q-badge reveal" style="background:rgba(0,212,168,0.1);color:#00897B;border-color:rgba(0,180,140,0.3);">Q.02</div>
-            <h2 class="big-question reveal">制作は、<br><span>内製？ 外注？</span></h2>
-            <div class="accent-divider reveal"></div>
-            <p class="reveal" style="color:#475569;font-size:0.95rem;line-height:1.8;">グッズ・ノベルティの製造は、現在内製ラインをお持ちですか？<br>それとも外部の製造パートナーにお任せされていますか？</p>
-        </div>
+  <!-- RIGHT: Script Panel -->
+  <div class="panel">
+    <div class="panel-head">
+      <h1>SAGULIFE｜ノベルティ商談プレゼン</h1>
+      <p>マーケ・販促部向け。スライドと台本が連動。左のプレビューで確認しながら進めてください。</p>
+      <div class="warn-banner">⚠ この画面を共有すると台本が見えます。「顧客表示を開く」で開いた別タブだけ共有してください。</div>
     </div>
-
-    <!-- SLIDE 4: アイスブレイク Q.03 -->
-    <div class="slide slide-4 slide-light-q" data-slide="4">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:300px;height:300px;top:-50px;right:-50px;background:#FFB84D;opacity:0.06;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:#64748b;">01　アイスブレイク</div>
-            <div class="q-badge reveal" style="background:rgba(255,184,77,0.1);color:#b45309;border-color:rgba(255,184,77,0.3);">Q.03</div>
-            <h2 class="big-question reveal">グッズ・ノベルティで、<br><span style="color:#FFB84D;">詰まりやすい</span><br>条件はありますか？</h2>
-            <div class="accent-divider reveal" style="background:linear-gradient(90deg,#FFB84D,#f97316);"></div>
-            <p class="reveal" style="color:#475569;font-size:0.95rem;line-height:1.8;">ロット・納期・特殊加工・デザイン対応のどの部分で課題が出やすいか、<br>もう少し詳しく聞かせていただけますか？</p>
-        </div>
+    <div class="panel-body">
+      <div class="controls">
+        <button class="ctrl-btn primary" id="btnOpen">顧客表示を開く</button>
+        <button class="ctrl-btn" id="btnFull">全画面</button>
+      </div>
+      <div class="controls">
+        <button class="ctrl-btn" id="btnPrev">← 前へ</button>
+        <button class="ctrl-btn" id="btnNext">次へ →</button>
+      </div>
+      <div class="controls">
+        <button class="ctrl-btn" id="btnCopyAsk">質問をコピー</button>
+        <button class="ctrl-btn" id="btnCopyAll">全台本コピー</button>
+      </div>
+      <div class="status-block">
+        <div id="audStatus">顧客表示：<b>未起動</b></div>
+        <div>経過時間：<b class="timer" id="timer">00:00</b></div>
+        <div>操作：<b>Space / →</b> 次へ、<b>←</b> 前へ、<b>1〜9</b> 指定</div>
+      </div>
+      <div class="cues" id="cues"></div>
+      <div class="kbd-hint">スライド番号キー（1〜9）で直接移動　｜　<b>Space</b>/<b>→</b> 次、<b>←</b> 前</div>
     </div>
-
-    <!-- SLIDE 5: アイスブレイク Q.04 -->
-    <div class="slide slide-5 slide-light-q" data-slide="5">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:300px;height:300px;top:-50px;left:-50px;background:#3b82f6;opacity:0.06;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:#64748b;">01　アイスブレイク</div>
-            <div class="q-badge reveal" style="background:rgba(59,130,246,0.1);color:#1d4ed8;border-color:rgba(59,130,246,0.3);">Q.04</div>
-            <h2 class="big-question reveal">納品先は、<br><span style="color:#3b82f6;">イベント？ 法人？<br>EC・ポップアップ？</span></h2>
-            <div class="accent-divider reveal" style="background:linear-gradient(90deg,#3b82f6,#00D4A8);"></div>
-            <p class="reveal" style="color:#475569;font-size:0.95rem;line-height:1.8;">エンドの販売チャネルによって、弊社が最も貢献できる領域が変わります。<br>現在のメイン納品先を教えていただけますか？</p>
-        </div>
-    </div>
-
-    <!-- SLIDE 6: 記憶を引き出す（主導権型・断言型） -->
-    <div class="slide slide-6 slide-light-q" data-slide="6">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:350px;height:350px;top:-60px;right:-60px;background:#00D4A8;opacity:0.07;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:#64748b;">01　アイスブレイク</div>
-            <h2 class="big-question reveal" style="font-size:clamp(2rem,5vw,3.5rem);">直近で、<br>制作会社に<br><span>断られた案件、<br>ありましたよね？</span></h2>
-            <div class="accent-divider reveal"></div>
-        </div>
-    </div>
-
-    <!-- SLIDE 7: 業界の現実 -->
-    <div class="slide slide-7 slide-dark-q" data-slide="7">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:400px;height:400px;top:-100px;right:-80px;background:var(--color-accent-1);opacity:0.12;"></div>
-            <div class="blob" style="width:250px;height:250px;bottom:-60px;left:-40px;background:var(--color-accent-2);opacity:0.08;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:var(--color-accent-1);">02　業界の現実</div>
-            <h2 class="reveal" style="font-family:'Noto Serif JP',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:900;color:var(--color-text);margin-bottom:0.5rem;">
-                その案件、<br><span style="color:#00D4A8;">断っていませんか？</span>
-            </h2>
-            <div class="accent-divider reveal"></div>
-            <p class="reveal" style="color:var(--color-text-muted);font-size:0.95rem;margin-bottom:1.5rem;">グッズ・ノベルティ業界では「小ロット・多品種・短納期」が常態化。制作会社様が製造パートナーから「その枚数では受けられない」「その納期は無理だ」と言われ、案件をお断りするケースが急増しています。</p>
-            <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
-                <div class="card-accent">
-                    <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:0.3rem;">断りやすい条件</div>
-                    <div style="font-weight:700;color:#f1f5f9;">30枚以下の小ロット</div>
-                </div>
-                <div class="card-accent">
-                    <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:0.3rem;">断りやすい条件</div>
-                    <div style="font-weight:700;color:#f1f5f9;">10営業日以下の短納期</div>
-                </div>
-                <div class="card-amber">
-                    <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:0.3rem;">断りやすい条件</div>
-                    <div style="font-weight:700;color:#f1f5f9;">刺繍×スタッズ等の特殊加工</div>
-                </div>
-                <div class="card-amber">
-                    <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:0.3rem;">断りやすい条件</div>
-                    <div style="font-weight:700;color:#f1f5f9;">アパレル系グッズ一式</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SLIDE 8: 感情スライド（主導権型） -->
-    <div class="slide slide-8 slide-dark-q" data-slide="8">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:400px;height:400px;top:-80px;right:-80px;background:var(--color-accent-2);opacity:0.10;"></div>
-        </div>
-        <div class="content text-center">
-            <h2 class="reveal" style="font-family:'Noto Serif JP',serif;font-size:clamp(2rem,5vw,3.8rem);font-weight:900;color:var(--color-text);line-height:1.4;">
-                その案件、<br><span style="color:#FFB84D;">本当は取れたはず、</span><br>では？
-            </h2>
-        </div>
-    </div>
-
-    <!-- SLIDE 9: 業界の現実 続き -->
-    <div class="slide slide-9 slide-dark-q" data-slide="9">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:350px;height:350px;top:-60px;right:-60px;background:var(--color-accent-1);opacity:0.10;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:var(--color-accent-1);">02　業界の現実</div>
-            <h2 class="reveal" style="font-family:'Noto Serif JP',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:900;color:var(--color-text);margin-bottom:1rem;">
-                納品期日、<br><span style="color:#00D4A8;">間に合っていますか？</span>
-            </h2>
-            <div class="accent-divider reveal"></div>
-            <p class="reveal" style="color:var(--color-text-muted);font-size:0.95rem;line-height:1.8;">グッズ・ノベルティ制作では、エンドから「まとめて全部頼みたい」と求められながら、製造先はアイテムごとに分散する構造が常態化。見積・仕様確認・納期調整が御社側に集中します。</p>
-            <p class="reveal" style="color:var(--color-accent-1);font-size:1rem;font-weight:700;margin-top:1rem;">弊社は、そのイレギュラー案件を拾う製造パートナーです。</p>
-        </div>
-    </div>
-
-    <!-- SLIDE 10: ポジショニング -->
-    <div class="slide slide-10 slide-dark-q" data-slide="10">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:500px;height:500px;top:-120px;right:-100px;background:var(--color-accent-1);opacity:0.12;"></div>
-            <div class="blob" style="width:250px;height:250px;bottom:-60px;left:-40px;background:var(--color-accent-2);opacity:0.08;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:var(--color-accent-1);">02　ポジショニング</div>
-            <h2 class="reveal" style="font-family:'Noto Serif JP',serif;font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:900;color:var(--color-text-muted);margin-bottom:0.5rem;">SAGULIFEは、</h2>
-            <h2 class="reveal glow-pulse" style="font-family:'Noto Serif JP',serif;font-size:clamp(2rem,4.5vw,3.5rem);font-weight:900;color:#00D4A8;margin-bottom:1rem;">グッズ業界の「駆け込み寺」。</h2>
-            <div class="accent-divider reveal"></div>
-            <p class="reveal" style="color:var(--color-text-muted);font-size:0.9rem;font-style:italic;margin-bottom:1.5rem;">他社が断った案件を、引き受けます。</p>
-            <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
-                <div class="card-glass" style="padding:1.2rem;">
-                    <div style="color:#00D4A8;font-size:0.85rem;font-weight:700;margin-bottom:0.5rem;">使いどころ</div>
-                    <div style="color:var(--color-text-secondary);font-size:0.9rem;">小ロット・短納期・特殊加工など既存ラインで重い案件</div>
-                </div>
-                <div class="card-glass" style="padding:1.2rem;">
-                    <div style="color:#FFB84D;font-size:0.85rem;font-weight:700;margin-bottom:0.5rem;">姿勢</div>
-                    <div style="color:var(--color-text-secondary);font-size:0.9rem;">メイン外注先を置き換えるのではなく、セカンドラインとして活用</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SLIDE 11: サービス概要 -->
-    <div class="slide slide-11 slide-dark-q" data-slide="11">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:350px;height:350px;top:-60px;right:-60px;background:var(--color-accent-1);opacity:0.08;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:var(--color-accent-1);">03　サービス</div>
-            <h2 class="reveal" style="font-family:'Noto Serif JP',serif;font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:900;color:var(--color-text);margin-bottom:1.5rem;">グッズから小物まで、<br><span style="color:#00D4A8;">すべて、1社で。</span></h2>
-            <div class="reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;">
-                <div class="card-glass" style="padding:1.2rem;text-align:center;">
-                    <div style="font-size:2rem;margin-bottom:0.5rem;">👕</div>
-                    <div style="color:#00D4A8;font-weight:700;font-size:0.9rem;margin-bottom:0.3rem;">アパレル</div>
-                    <div style="color:var(--color-text-muted);font-size:0.75rem;">Tシャツ・パーカー・スウェット</div>
-                </div>
-                <div class="card-glass" style="padding:1.2rem;text-align:center;">
-                    <div style="font-size:2rem;margin-bottom:0.5rem;">🎁</div>
-                    <div style="color:#FFB84D;font-weight:700;font-size:0.9rem;margin-bottom:0.3rem;">グッズ</div>
-                    <div style="color:var(--color-text-muted);font-size:0.75rem;">キーホルダー・バッグ・雑貨</div>
-                </div>
-                <div class="card-glass" style="padding:1.2rem;text-align:center;">
-                    <div style="font-size:2rem;margin-bottom:0.5rem;">🏷️</div>
-                    <div style="color:#93c5fd;font-weight:700;font-size:0.9rem;margin-bottom:0.3rem;">ノベルティ</div>
-                    <div style="color:var(--color-text-muted);font-size:0.75rem;">名入れ・企業ロゴ対応</div>
-                </div>
-                <div class="card-glass" style="padding:1.2rem;text-align:center;">
-                    <div style="font-size:2rem;margin-bottom:0.5rem;">🔧</div>
-                    <div style="color:#00D4A8;font-weight:700;font-size:0.9rem;margin-bottom:0.3rem;">OEM</div>
-                    <div style="color:var(--color-text-muted);font-size:0.75rem;">企画〜製造まで一括</div>
-                </div>
-            </div>
-            <p class="reveal" style="color:var(--color-text-muted);font-size:0.85rem;margin-top:1rem;">他社様ではアパレルはA社、小物はB社と分かれるケースが多いですが、弊社では全てまとめてお任せいただけます。</p>
-        </div>
-    </div>
-
-    <!-- SLIDE 12: 3つの強み サマリー -->
-    <div class="slide slide-12 slide-dark-q" data-slide="12">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:450px;height:450px;top:-80px;right:-80px;background:var(--color-accent-1);opacity:0.12;"></div>
-            <div class="blob" style="width:250px;height:250px;bottom:-60px;left:-40px;background:var(--color-accent-2);opacity:0.08;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:var(--color-accent-1);">04　3つの強み</div>
-            <h2 class="reveal" style="font-family:'Noto Serif JP',serif;font-size:clamp(1.5rem,3.2vw,2.2rem);font-weight:900;color:var(--color-text);margin-bottom:1.5rem;">貴社に、メリットのある3つ。</h2>
-            <div class="reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;">
-                <div class="card-glass" style="text-align:center;padding:1.8rem 1.2rem;">
-                    <div style="font-size:2.4rem;font-weight:900;color:#00D4A8;margin-bottom:0.5rem;">01</div>
-                    <div style="font-size:1.3rem;font-weight:900;color:var(--color-text);margin-bottom:0.4rem;">最短3〜4日</div>
-                    <div style="color:#00D4A8;font-size:0.85rem;">納品</div>
-                </div>
-                <div class="card-glass" style="text-align:center;padding:1.8rem 1.2rem;">
-                    <div style="font-size:2.4rem;font-weight:900;color:#FFB84D;margin-bottom:0.5rem;">02</div>
-                    <div style="font-size:1.3rem;font-weight:900;color:var(--color-text);margin-bottom:0.4rem;">全部やる</div>
-                    <div style="color:#FFB84D;font-size:0.85rem;">他が断る加工も</div>
-                </div>
-                <div class="card-glass" style="text-align:center;padding:1.8rem 1.2rem;">
-                    <div style="font-size:2.4rem;font-weight:900;color:#00D4A8;margin-bottom:0.5rem;">03</div>
-                    <div style="font-size:1.3rem;font-weight:900;color:var(--color-text);margin-bottom:0.4rem;">即、返す</div>
-                    <div style="color:#00D4A8;font-size:0.85rem;">リアルタイム連携</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SLIDE 13: 強み01 スピード -->
-    <div class="slide slide-13 slide-dark-q" data-slide="13">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:400px;height:400px;top:-80px;right:-80px;background:var(--color-accent-1);opacity:0.12;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:var(--color-accent-1);">04　強み 01</div>
-            <h2 class="reveal" style="font-family:'Noto Serif JP',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:900;color:var(--color-text);">最短</h2>
-            <div class="reveal stat-glow glow-pulse" style="font-family:'Noto Serif JP',serif;font-size:clamp(4rem,10vw,7rem);font-weight:900;color:#00D4A8;line-height:1;">3〜4日</div>
-            <h2 class="reveal" style="font-family:'Noto Serif JP',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:900;color:var(--color-text);">納品。</h2>
-            <div class="accent-divider reveal"></div>
-            <p class="reveal" style="color:var(--color-text-muted);font-style:italic;">通常1ヶ月 → 弊社2週間前後。急ぎのグッズ・ノベルティ案件はご相談ください。</p>
-        </div>
-    </div>
-
-    <!-- SLIDE 14: 強み02 特殊加工 -->
-    <div class="slide slide-14 slide-dark-q" data-slide="14">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:400px;height:400px;top:-80px;right:-80px;background:var(--color-accent-2);opacity:0.10;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:#FFB84D;">04　強み 02</div>
-            <h2 class="reveal" style="font-family:'Noto Serif JP',serif;font-size:clamp(1.6rem,3.5vw,2.8rem);font-weight:900;color:var(--color-text);margin-bottom:0.5rem;">断られる加工、</h2>
-            <h2 class="reveal" style="font-family:'Noto Serif JP',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:900;color:#FFB84D;margin-bottom:1.5rem;">全部やります。</h2>
-            <div class="reveal" style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:0.5rem;">
-                <div style="background:rgba(255,184,77,0.12);border:1px solid rgba(255,184,77,0.3);color:#FFB84D;padding:0.6rem 1.2rem;border-radius:8px;font-size:0.9rem;font-weight:700;">ジップ跨ぎプリント</div>
-                <div style="background:rgba(255,184,77,0.12);border:1px solid rgba(255,184,77,0.3);color:#FFB84D;padding:0.6rem 1.2rem;border-radius:8px;font-size:0.9rem;font-weight:700;">ジルコニアストーン接着</div>
-                <div style="background:rgba(255,184,77,0.12);border:1px solid rgba(255,184,77,0.3);color:#FFB84D;padding:0.6rem 1.2rem;border-radius:8px;font-size:0.9rem;font-weight:700;">刺繍×スタッズ</div>
-                <div style="background:rgba(255,184,77,0.08);border:1px solid rgba(255,184,77,0.2);color:#fbbf24;padding:0.6rem 1.2rem;border-radius:8px;font-size:0.9rem;">名入れ全アイテム対応</div>
-                <div style="background:rgba(255,184,77,0.08);border:1px solid rgba(255,184,77,0.2);color:#fbbf24;padding:0.6rem 1.2rem;border-radius:8px;font-size:0.9rem;">ノベルティ特注仕様</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SLIDE 15: 強み03 コミュニケーション -->
-    <div class="slide slide-15 slide-dark-q" data-slide="15">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:400px;height:400px;top:-80px;right:-80px;background:var(--color-accent-1);opacity:0.10;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:var(--color-accent-1);">04　強み 03</div>
-            <h2 class="reveal" style="font-family:'Noto Serif JP',serif;font-size:clamp(2rem,4.5vw,3.5rem);font-weight:900;color:#00D4A8;margin-bottom:1rem;">即、返します。</h2>
-            <div class="accent-divider reveal"></div>
-            <p class="reveal" style="color:var(--color-text-muted);font-style:italic;margin-bottom:1.5rem;">チャット1本でつながる、リアルタイム連携。</p>
-            <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-                <div class="card-accent">
-                    <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:0.3rem;">自社ブランド運営で鍛えた</div>
-                    <div style="font-weight:700;color:#f1f5f9;">デザイン意図を汲む速度</div>
-                </div>
-                <div class="card-accent">
-                    <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:0.3rem;">製造現場と営業が直結</div>
-                    <div style="font-weight:700;color:#f1f5f9;">「連絡が遅い」がない体制</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SLIDE 16: 沈黙スライド -->
-    <div class="slide slide-16 slide-light-q" data-slide="16">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:350px;height:350px;top:-60px;right:-60px;background:#00D4A8;opacity:0.06;"></div>
-        </div>
-        <div class="content text-center">
-            <p class="reveal" style="color:#475569;font-size:1rem;margin-bottom:1rem;">ここまでで、</p>
-            <h2 class="big-question reveal" style="font-size:clamp(2rem,5vw,3.5rem);">どう思われましたか？</h2>
-        </div>
-    </div>
-
-    <!-- SLIDE 17: 進め方 -->
-    <div class="slide slide-17 slide-dark-q" data-slide="17">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:350px;height:350px;top:-60px;right:-60px;background:var(--color-accent-1);opacity:0.08;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:var(--color-accent-1);">05　進め方</div>
-            <h2 class="reveal" style="font-family:'Noto Serif JP',serif;font-size:clamp(1.5rem,3vw,2.2rem);font-weight:900;color:var(--color-text);margin-bottom:1.5rem;">チャット1本から、納品まで。</h2>
-            <div class="reveal" style="display:flex;flex-direction:column;gap:0.8rem;">
-                <div style="display:flex;align-items:center;gap:1rem;">
-                    <div class="step-num">1</div>
-                    <div>
-                        <div style="font-weight:700;color:var(--color-text);">ご相談</div>
-                        <div style="font-size:0.8rem;color:var(--color-text-muted);">スポットでも、一貫でも。</div>
-                    </div>
-                </div>
-                <div style="display:flex;align-items:center;gap:1rem;">
-                    <div class="step-num">2</div>
-                    <div>
-                        <div style="font-weight:700;color:var(--color-text);">仕様確定</div>
-                        <div style="font-size:0.8rem;color:var(--color-text-muted);">アイテム・加工・数量・納期を確認。</div>
-                    </div>
-                </div>
-                <div style="display:flex;align-items:center;gap:1rem;">
-                    <div class="step-num">3</div>
-                    <div>
-                        <div style="font-weight:700;color:var(--color-text);">サンプル</div>
-                        <div style="font-size:0.8rem;color:var(--color-text-muted);">品質確認・修正対応。</div>
-                    </div>
-                </div>
-                <div style="display:flex;align-items:center;gap:1rem;">
-                    <div class="step-num">4</div>
-                    <div>
-                        <div style="font-weight:700;color:var(--color-text);">本生産</div>
-                        <div style="font-size:0.8rem;color:var(--color-text-muted);">リアルタイム進捗共有。</div>
-                    </div>
-                </div>
-                <div style="display:flex;align-items:center;gap:1rem;">
-                    <div class="step-num">5</div>
-                    <div>
-                        <div style="font-weight:700;color:var(--color-text);">納品</div>
-                        <div style="font-size:0.8rem;color:var(--color-text-muted);">御社名義での納品・梱包にも対応。</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SLIDE 18: 実績 -->
-    <div class="slide slide-18 slide-dark-q" data-slide="18">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:400px;height:400px;top:-80px;right:-80px;background:var(--color-accent-2);opacity:0.10;"></div>
-            <div class="blob" style="width:250px;height:250px;bottom:-60px;left:-40px;background:var(--color-accent-1);opacity:0.08;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:var(--color-accent-1);">06　実績</div>
-            <h2 class="reveal" style="font-family:'Noto Serif JP',serif;font-size:clamp(1.5rem,3vw,2.2rem);font-weight:900;color:var(--color-text);margin-bottom:1.5rem;">大手事務所からも、口コミで。</h2>
-            <div class="reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;">
-                <div class="card-glass" style="padding:1.2rem;text-align:center;">
-                    <div style="font-size:0.85rem;font-weight:900;color:var(--color-text);margin-bottom:0.3rem;">HORIPRO</div>
-                    <div style="color:#00D4A8;font-size:0.8rem;font-weight:700;">ホリプロ様</div>
-                    <div style="color:var(--color-text-muted);font-size:0.75rem;margin-top:0.3rem;">継続グッズ発注</div>
-                </div>
-                <div class="card-glass" style="padding:1.2rem;text-align:center;">
-                    <div style="font-size:0.85rem;font-weight:900;color:var(--color-text);margin-bottom:0.3rem;">UUUM</div>
-                    <div style="color:#00D4A8;font-size:0.8rem;font-weight:700;">UUUM様</div>
-                    <div style="color:var(--color-text-muted);font-size:0.75rem;margin-top:0.3rem;">クリエイターグッズ</div>
-                </div>
-                <div class="card-glass" style="padding:1.2rem;text-align:center;">
-                    <div style="font-size:0.85rem;font-weight:900;color:var(--color-text);margin-bottom:0.3rem;">PARCO / 三井不動産</div>
-                    <div style="color:#FFB84D;font-size:0.8rem;font-weight:700;">ポップアップ実績</div>
-                    <div style="color:var(--color-text-muted);font-size:0.75rem;margin-top:0.3rem;">制作＋販売サポート</div>
-                </div>
-            </div>
-            <p class="reveal" style="color:var(--color-text-muted);font-size:0.85rem;">弊社は自社ブランドも展開しており、品質基準が高い。そのクオリティが評価され、口コミで大手からご発注をいただいています。</p>
-        </div>
-    </div>
-
-    <!-- SLIDE 19: ここからが本題 -->
-    <div class="slide slide-19 slide-dark-q" data-slide="19">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:500px;height:500px;top:-120px;right:-100px;background:var(--color-accent-1);opacity:0.14;"></div>
-        </div>
-        <canvas class="particle-canvas-ambient" style="position:absolute;inset:0;z-index:1;"></canvas>
-        <div class="content text-center">
-            <p class="reveal" style="color:var(--color-text-muted);font-size:1.1rem;margin-bottom:0.75rem;">ここからが、</p>
-            <h2 class="reveal glow-pulse" style="font-family:'Noto Serif JP',serif;font-size:clamp(3rem,7vw,5.5rem);font-weight:900;color:#00D4A8;">本題です。</h2>
-        </div>
-    </div>
-
-    <!-- SLIDE 20: ヒアリング H.01 -->
-    <div class="slide slide-20 slide-light-q" data-slide="20">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:300px;height:300px;top:-50px;right:-50px;background:#00D4A8;opacity:0.06;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:#64748b;">07　ヒアリング</div>
-            <div class="q-badge reveal" style="background:rgba(0,212,168,0.1);color:#00897B;border-color:rgba(0,180,140,0.3);">H.01</div>
-            <h2 class="big-question reveal">現体制で、<br><span>改善したい点は？</span></h2>
-            <div class="accent-divider reveal"></div>
-            <p class="reveal" style="color:#475569;font-size:0.9rem;line-height:1.8;">グッズ・ノベルティ制作において、ロット・納期・コスト・クオリティのどこに課題が出やすいか、現状の外注先構成とあわせて教えていただけますか？</p>
-        </div>
-    </div>
-
-    <!-- SLIDE 21: ヒアリング H.02 -->
-    <div class="slide slide-21 slide-light-q" data-slide="21">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:300px;height:300px;top:-50px;right:-50px;background:#FFB84D;opacity:0.06;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:#64748b;">07　ヒアリング</div>
-            <div class="q-badge reveal" style="background:rgba(255,184,77,0.1);color:#b45309;border-color:rgba(255,184,77,0.3);">H.02</div>
-            <h2 class="big-question reveal">ロット・納期・<br><span style="color:#FFB84D;">コスト・クオリティ、<br>どこが一番？</span></h2>
-            <div class="accent-divider reveal" style="background:linear-gradient(90deg,#FFB84D,#f97316);"></div>
-            <p class="reveal" style="color:#475569;font-size:0.9rem;line-height:1.8;">特に頻繁に課題になるポイントを教えてください。弊社の対応領域とのマッチングを確認します。</p>
-        </div>
-    </div>
-
-    <!-- SLIDE 22: ヒアリング H.03 -->
-    <div class="slide slide-22 slide-light-q" data-slide="22">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:300px;height:300px;top:-50px;left:-50px;background:#3b82f6;opacity:0.06;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:#64748b;">07　ヒアリング</div>
-            <div class="q-badge reveal" style="background:rgba(59,130,246,0.1);color:#1d4ed8;border-color:rgba(59,130,246,0.3);">H.03</div>
-            <h2 class="big-question reveal">グッズとノベルティ、<br><span style="color:#3b82f6;">どちらを<br>今後強化？</span></h2>
-            <div class="accent-divider reveal" style="background:linear-gradient(90deg,#3b82f6,#00D4A8);"></div>
-            <p class="reveal" style="color:#475569;font-size:0.9rem;line-height:1.8;">エンタメ系グッズ、IPライセンス品、法人ノベルティ、イベント物販など、強化したい領域を教えていただけますか？</p>
-        </div>
-    </div>
-
-    <!-- SLIDE 23: ヒアリング H.04 -->
-    <div class="slide slide-23 slide-light-q" data-slide="23">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:300px;height:300px;top:-50px;right:-50px;background:#00D4A8;opacity:0.06;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:#64748b;">07　ヒアリング</div>
-            <div class="q-badge reveal" style="background:rgba(0,212,168,0.1);color:#00897B;border-color:rgba(0,180,140,0.3);">H.04</div>
-            <h2 class="big-question reveal">リアルイベント・<br>ポップアップの<br><span>ご構想は？</span></h2>
-            <div class="accent-divider reveal"></div>
-            <p class="reveal" style="color:#475569;font-size:0.9rem;line-height:1.8;">弊社はPARCO・三井不動産でのポップアップ出店・販売スタッフ手配まで対応可能です。制作+リアル展開の両面でご支援できます。</p>
-        </div>
-    </div>
-
-    <!-- SLIDE 24: ヒアリング H.05 -->
-    <div class="slide slide-24 slide-light-q" data-slide="24">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:300px;height:300px;bottom:-50px;right:-50px;background:#FFB84D;opacity:0.06;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:#64748b;">07　ヒアリング</div>
-            <div class="q-badge reveal" style="background:rgba(255,184,77,0.1);color:#b45309;border-color:rgba(255,184,77,0.3);">H.05</div>
-            <h2 class="big-question reveal">直近、<br>ライン逼迫の<br><span style="color:#FFB84D;">案件はありますか？</span></h2>
-            <div class="accent-divider reveal" style="background:linear-gradient(90deg,#FFB84D,#f97316);"></div>
-            <p class="reveal" style="color:#475569;font-size:0.9rem;line-height:1.8;">具体的な案件が控えているなら、今すぐ対応可否の判定が可能です。アイテム・数量・納期・加工内容をお聞かせください。</p>
-        </div>
-    </div>
-
-    <!-- SLIDE 25: ヒアリング H.06 -->
-    <div class="slide slide-25 slide-light-q" data-slide="25">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:300px;height:300px;top:-50px;right:-50px;background:#3b82f6;opacity:0.06;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:#64748b;">07　ヒアリング</div>
-            <div class="q-badge reveal" style="background:rgba(59,130,246,0.1);color:#1d4ed8;border-color:rgba(59,130,246,0.3);">H.06</div>
-            <h2 class="big-question reveal">グッズ1アイテム、<br>現在の<span style="color:#3b82f6;">単価感は？</span></h2>
-            <div class="accent-divider reveal" style="background:linear-gradient(90deg,#3b82f6,#00D4A8);"></div>
-            <p class="reveal" style="color:#475569;font-size:0.9rem;line-height:1.8;">例えば「Tシャツ1枚・A3サイズ1箇所プリント・30枚ロット」でのご発注単価を目安で教えていただけますか？弊社の競争力と合うか確認します。</p>
-        </div>
-    </div>
-
-    <!-- SLIDE 26: NEXT STEP クロージング -->
-    <div class="slide slide-26 slide-dark-q" data-slide="26">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:500px;height:500px;top:-120px;right:-100px;background:var(--color-accent-1);opacity:0.14;"></div>
-            <div class="blob" style="width:250px;height:250px;bottom:-60px;left:-40px;background:var(--color-accent-2);opacity:0.10;"></div>
-        </div>
-        <div class="content">
-            <div class="section-label reveal" style="color:var(--color-accent-1);">NEXT STEP</div>
-            <h2 class="reveal" style="font-family:'Noto Serif JP',serif;font-size:clamp(1.5rem,3.4vw,2.6rem);font-weight:900;color:var(--color-text);margin-bottom:0.5rem;">次回日程より先に、</h2>
-            <h2 class="reveal glow-pulse" style="font-family:'Noto Serif JP',serif;font-size:clamp(1.9rem,4.2vw,3.4rem);font-weight:900;color:#00D4A8;margin-bottom:1.2rem;">過去案件を1件ください。</h2>
-            <div class="accent-divider reveal"></div>
-            <p class="reveal" style="color:var(--color-text-muted);font-size:0.95rem;margin-bottom:1.4rem;line-height:1.8;">会社説明ではなく、実案件で判定します。<br>御社の既存先向きか、SAGULIFEで拾える案件かを切り分けます。</p>
-            <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem;">
-                <div class="card-glass" style="padding:1.2rem;">
-                    <div style="color:#00D4A8;font-size:0.85rem;font-weight:700;margin-bottom:0.5rem;">共有いただく情報</div>
-                    <div style="color:var(--color-text-secondary);font-size:0.86rem;line-height:1.8;">アイテム／数量／希望納期／加工内容／データ有無／希望単価／納品先</div>
-                </div>
-                <div class="card-glass" style="padding:1.2rem;">
-                    <div style="color:#FFB84D;font-size:0.85rem;font-weight:700;margin-bottom:0.5rem;">48時間以内に返す内容</div>
-                    <div style="color:var(--color-text-secondary);font-size:0.86rem;line-height:1.8;">対応可否／概算費用／想定納期／リスク箇所／サンプル要否</div>
-                </div>
-            </div>
-            <div class="reveal" style="background:rgba(0,212,168,0.08);border:1px solid rgba(0,212,168,0.24);border-radius:14px;padding:1.25rem;text-align:center;">
-                <div style="font-size:3.4rem;font-weight:900;color:#00D4A8;line-height:1;">48h</div>
-                <div style="font-size:1.05rem;font-weight:700;color:var(--color-text);margin-top:0.65rem;">まずは、対応しづらかった案件を1件共有ください。</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SLIDE 27: Thank You -->
-    <div class="slide slide-27 slide-dark-q" data-slide="27">
-        <div class="gradient-mesh">
-            <div class="blob" style="width:500px;height:500px;top:-100px;right:-80px;background:var(--color-accent-1);opacity:0.15;"></div>
-            <div class="blob" style="width:300px;height:300px;bottom:-80px;left:-60px;background:var(--color-accent-2);opacity:0.12;"></div>
-            <div class="blob" style="width:200px;height:200px;top:40%;left:20%;background:var(--color-accent-3);opacity:0.10;"></div>
-        </div>
-        <canvas class="particle-canvas" style="position:absolute;inset:0;z-index:1;"></canvas>
-        <div class="content text-center">
-            <div style="font-size:80px;margin-bottom:1.5rem;animation:float 3s ease-in-out infinite;" class="reveal">🙏</div>
-            <h2 class="reveal glow-pulse" style="font-family:'Noto Serif JP',serif;font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;background:linear-gradient(135deg,#00D4A8,#FFB84D);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ありがとうございました。</h2>
-            <p class="reveal" style="color:var(--color-text-muted);letter-spacing:0.1em;font-size:1rem;margin-top:1rem;">株式会社SAGULIFE　／　御社の商流を守る製造サブライン</p>
-        </div>
-    </div>
-
-</div>
-
-
-
-<div class="mini-progress" id="miniProgress"></div>
-<div class="presenter-tools" aria-label="presentation tools">
-    <span class="presenter-chip" id="timerChip">00:00</span>
-    <button class="presenter-btn" id="btnNotes" title="S: 台本パネル">台本</button>
-    <button class="presenter-btn" id="btnPresenter" title="P: 登壇者ビューを別窓で開く">別窓</button>
-    <button class="presenter-btn" id="btnOverview" title="O: スライド一覧">一覧</button>
-    <button class="presenter-btn" id="btnHelp" title="/: ショートカット">?</button>
-</div>
-
-<aside class="script-panel" id="scriptPanel" aria-live="polite">
-    <div class="script-head">
-        <div>
-            <div class="script-kicker" id="scriptKicker">SLIDE 01 / 27</div>
-            <div class="script-title" id="scriptTitle">タイトル</div>
-        </div>
-        <button class="script-close" id="scriptClose" aria-label="台本を閉じる">×</button>
-    </div>
-    <div class="script-body">
-        <div class="script-section script-safe"><div class="script-label">このスライドの目的</div><div class="script-text" id="scriptGoal"></div></div>
-        <div class="script-section"><div class="script-label">話す台本</div><div class="script-text main" id="scriptMain"></div></div>
-        <div class="script-section"><div class="script-label">商談者への合図</div><div class="script-text" id="scriptCue"></div></div>
-        <div class="script-section script-alert"><div class="script-label">封印・注意</div><div class="script-text" id="scriptAvoid"></div></div>
-        <div class="script-actions">
-            <button class="script-action" id="copyScript">台本コピー</button>
-            <button class="script-action" id="copyAllScripts">全台本コピー</button>
-        </div>
-    </div>
-</aside>
-
-<div class="overview" id="overview"><button class="overview-close" id="overviewClose">閉じる</button><div class="overview-grid" id="overviewGrid"></div></div>
-<div class="blackout" id="blackout">SAGULIFE</div>
-<div class="help-pop" id="helpPop">
-    <div><b>→ / Space</b> 次へ　<b>←</b> 前へ</div>
-    <div><b>S</b> 台本　<b>P</b> 登壇者ビュー　<b>O</b> 一覧</div>
-    <div><b>F</b> 全画面　<b>B</b> 暗転　<b>/</b> ヘルプ</div>
-</div>
-<div class="toast" id="toast">コピーしました</div>
-
-<!-- NAVIGATION -->
-<div class="nav-controls">
-    <button class="nav-btn" onclick="changeSlide(-1)">&#8249;</button>
-    <div class="slide-dots" id="dots"></div>
-    <button class="nav-btn" onclick="changeSlide(1)">&#8250;</button>
-    <span class="slide-counter" id="counter">1 / 27</span>
+  </div>
 </div>
 
 <script>
-    let current = 1;
-    const total = document.querySelectorAll('.slide').length;
-    const dotsContainer = document.getElementById('dots');
-    const counter = document.getElementById('counter');
-    for (let i = 1; i <= total; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'dot' + (i === 1 ? ' active' : '');
-        dot.onclick = () => goToSlide(i);
-        dotsContainer.appendChild(dot);
-    }
-    function goToSlide(n) {
-        const prev = document.querySelector('.slide.active');
-        const next = document.querySelector('.slide[data-slide="' + n + '"]');
-        if (prev) prev.classList.remove('active');
-        if (next) { next.classList.add('active'); animateSlide(next); }
-        current = n; updateNav();
-    }
-    function changeSlide(dir) {
-        let next = current + dir;
-        if (next < 1) next = total;
-        if (next > total) next = 1;
-        goToSlide(next);
-    }
-    function updateNav() {
-        document.querySelectorAll('.dot').forEach((d, i) => { d.classList.toggle('active', i + 1 === current); });
-        counter.textContent = current + ' / ' + total;
-    }
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changeSlide(1); }
-        if (e.key === 'ArrowLeft') { e.preventDefault(); changeSlide(-1); }
-    });
-    let touchStartX = 0;
-    document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
-    document.addEventListener('touchend', (e) => { const diff = touchStartX - e.changedTouches[0].clientX; if (Math.abs(diff) > 50) changeSlide(diff > 0 ? 1 : -1); });
-
-    function animateSlide(slide) {
-        slide.querySelectorAll('.reveal').forEach((el, i) => {
-            el.style.transition = 'none';
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(20px)';
-            el.offsetHeight;
-            const delay = i * 0.08;
-            el.style.transition = 'opacity 0.35s ease ' + delay + 's, transform 0.35s ease ' + delay + 's';
-            el.style.opacity = '1';
-            el.style.transform = 'translateY(0px)';
-        });
-    }
-
-    document.addEventListener('mousemove', (e) => {
-        const spotlight = document.querySelector('.mouse-spotlight');
-        if (spotlight) {
-            spotlight.style.background = 'radial-gradient(600px circle at ' + e.clientX + 'px ' + e.clientY + 'px, rgba(0,212,168,0.06), transparent 40%)';
-        }
-    });
-
-    window.initParticles = function(canvas, options) {
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        canvas.width = canvas.offsetWidth || window.innerWidth;
-        canvas.height = canvas.offsetHeight || window.innerHeight;
-        const interactive = options.interactive !== false;
-        const count = options.count || (interactive ? 55 : 18);
-        let mx = -1000, my = -1000;
-        const particles = Array.from({ length: count }, () => ({
-            x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-            vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
-            size: Math.random() * 2.5 + 0.8, alpha: Math.random() * 0.35 + 0.1
-        }));
-        if (interactive) {
-            canvas.addEventListener('mousemove', (e) => { const rect = canvas.getBoundingClientRect(); mx = e.clientX - rect.left; my = e.clientY - rect.top; });
-            canvas.addEventListener('mouseleave', () => { mx = -1000; my = -1000; });
-        }
-        (function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                if (interactive) { const dx = p.x - mx, dy = p.y - my, dist = Math.sqrt(dx * dx + dy * dy); if (dist < 120) { const force = (120 - dist) / 120 * 2; p.vx += (dx / dist) * force * 0.1; p.vy += (dy / dist) * force * 0.1; } }
-                p.vx *= 0.98; p.vy *= 0.98; p.x += p.vx; p.y += p.vy;
-                if (p.x < 0) p.x = canvas.width; if (p.x > canvas.width) p.x = 0;
-                if (p.y < 0) p.y = canvas.height; if (p.y > canvas.height) p.y = 0;
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(0,212,168,' + p.alpha + ')'; ctx.fill();
-            });
-            requestAnimationFrame(animate);
-        })();
-    };
-    document.querySelectorAll('.particle-canvas').forEach(c => window.initParticles(c, { interactive: true, count: 55 }));
-    document.querySelectorAll('.particle-canvas-ambient').forEach(c => window.initParticles(c, { interactive: false, count: 18 }));
-
-    try { animateSlide(document.querySelector('.slide.active')); } catch(e) { console.warn('Initial animation error:', e); }
-</script>
-
-
-<script id="sagulife-presenter-v7-js">
-(function() {
-  const notesData = {"1": {"title": "タイトル｜警戒を下げる入口", "goal": "相手に『競合ではなく裏側の製造ライン』だと最初に理解させる。", "script": "本日は、御社の既存外注先を置き換える話ではありません。短納期・小ロット・特殊加工・アパレル系など、通常ルートでは出しづらい案件を、弊社が裏側で拾えるかを判断する場にできればと思っています。", "cue": "冒頭で売り込まない。『判断する場』と言い切る。", "avoid": "企画から販売まで／ワンストップ／直接提案できます、は初回で出さない。"}, "2": {"title": "Q.01｜興味理由の確認", "goal": "相手が何に反応したのかを先に喋らせる。", "script": "先日のお電話でご興味を持っていただいた理由は、新しい制作会社を探していたというより、既存の製造先だけでは拾いづらい案件がどこかにあるからではないかと見ています。実際のところ、近いでしょうか。", "cue": "回答を遮らない。ここで相手の課題語彙を拾う。", "avoid": "いきなり会社説明に入らない。"}, "3": {"title": "Q.02｜内製／外注の確認", "goal": "現行の製造構造を把握し、置き換えではなくサブラインに寄せる。", "script": "グッズ・ノベルティの製造は、現在内製ラインをお持ちですか。それとも外部の製造パートナーにお任せされていますか。通常案件は今の体制で十分回っている前提で、出しづらい案件だけ確認させてください。", "cue": "既存先を否定しない。", "avoid": "既存先より弊社が良い、という比較にしない。"}, "4": {"title": "Q.03｜詰まり条件の特定", "goal": "小ロット・短納期・特殊加工のどれが刺さるか判定する。", "script": "ロット・納期・特殊加工・デザイン対応のどの部分で課題が出やすいでしょうか。30枚以下、10営業日以下、ジップ跨ぎプリント、刺繍×スタッズ、ジルコニアストーン接着のような案件で、出しづらかったものはありますか。", "cue": "条件を具体化して記憶を引き出す。", "avoid": "『何か困っていますか？』のような浅い質問にしない。"}, "5": {"title": "Q.04｜納品先・用途の確認", "goal": "イベント固定納期／法人ノベルティ／EC物販など、納期圧力の源泉を掴む。", "script": "納品先はイベント、法人、EC、ポップアップのどれが多いでしょうか。用途によって、弊社が一番貢献できるポイントが変わります。イベント日や公開日が決まっている案件ほど、製造側の判断が重要になります。", "cue": "用途を聞いてからSAGULIFEの使いどころへ接続。", "avoid": "ポップアップ支援を前面に出し過ぎない。"}, "6": {"title": "記憶喚起｜断った案件", "goal": "相手の脳内から『惜しかった案件』を引っ張り出す。", "script": "直近で、制作会社に断られた案件、もしくは御社側で受けたけれど製造先の都合でかなり重かった案件があったのではないかと思っています。30枚以下、10営業日以下、特殊加工あり。この条件のどれかに近いものはありますか。", "cue": "断言気味に置いて、相手に修正させる。", "avoid": "責めているように言わない。"}, "7": {"title": "業界の現実｜断っていませんか？", "goal": "機会損失を相手の課題として言語化する。", "script": "グッズ・ノベルティ制作会社様の場合、通常案件は既存の協力先で十分回るはずです。ただ、30枚以下、10営業日以下、アパレル絡み、特殊加工、仕様確定の遅れが重なると、急に製造先の選択肢が狭くなります。", "cue": "ここは『御社が悪い』ではなく『構造が重い』で話す。", "avoid": "価格訴求に落とさない。"}, "8": {"title": "感情スライド｜本当は取れたはず", "goal": "相手に過去案件の損失感を持たせる。", "script": "その案件、本当は取れたはずではないでしょうか。弊社が見たいのは、御社の通常案件ではなく、断るには惜しいが既存ルートでは重い案件です。", "cue": "沈黙を使う。相手が話す余白を作る。", "avoid": "すぐ次の説明へ逃げない。"}, "9": {"title": "業界構造｜調整負荷の集中", "goal": "制作会社側に見積・仕様確認・納期調整が集中する構造を示す。", "script": "エンド側は、商品選定も、デザイン反映も、アパレルも、小物も、短納期も、まとめて見てほしいと言います。一方で、実際の製造先はアイテムごとに分かれます。その結果、御社側が見積・仕様確認・納期調整・品質確認を抱える構造になります。", "cue": "相手の苦労を代弁する。", "avoid": "SAGULIFEが全部表に出る話にしない。"}, "10": {"title": "ポジショニング｜駆け込み寺", "goal": "通常案件ではなく、重い案件のサブラインだと定義する。", "script": "SAGULIFEは、御社の主導権を奪わずに案件を拾う黒子製造ラインです。通常案件は今まで通りで構いません。30枚以下、10営業日以下、特殊加工、アパレル系、断るには惜しい案件だけご相談ください。", "cue": "『置き換えではない』を短く強く。", "avoid": "便利屋に見える言い方を避ける。"}, "11": {"title": "サービス概要｜対応幅", "goal": "幅を見せるが、使いどころを絞る。", "script": "対応領域は、Tシャツ、パーカー、スウェット、バッグ、小物系グッズ、イベント物販向けアイテム、OEM、刺繍、スタッズ、ストーン加工などです。ただ、今日の話ではアイテムの幅より、使いどころが重要です。既存先が嫌がる数量・納期・加工の案件に使ってください。", "cue": "列挙で終わらず、使いどころへ戻す。", "avoid": "世界観づくりを強く言い過ぎない。"}, "12": {"title": "3つの強み｜全体像", "goal": "覚えるべきUSPを3つに絞る。", "script": "御社にとってのメリットは3つです。既存工場が嫌がる案件の逃げ道になること。アパレル系グッズを裏側で拾えること。案件を受けるか断るかの一次判定に使えることです。", "cue": "数字より『逃げ道・裏側・判定』の3語を残す。", "avoid": "強みを全部盛りしない。"}, "13": {"title": "強み01｜スピード", "goal": "短納期相談の入口を作る。", "script": "目安として、10営業日以下は短納期案件として見ます。内容によっては最短3〜4日で対応できるケースもあります。ただし無理な約束はせず、アイテム、数量、加工、データ状態を見て現実的に判定します。", "cue": "スピードは約束ではなく判定力として語る。", "avoid": "常に3〜4日で可能と言わない。"}, "14": {"title": "強み02｜特殊加工", "goal": "既存工場が嫌がる加工の受け皿を印象づける。", "script": "ジップ跨ぎプリント、刺繍×スタッズ、ジルコニアストーン接着など、通常工場が嫌がりやすい加工が対象になります。無条件にすべて対応できるわけではありませんが、加工位置、素材、数量、納期を見たうえで対応可否を判断します。", "cue": "『全部やります』の後に『判定します』で信用を作る。", "avoid": "できない可能性を隠さない。"}, "15": {"title": "強み03｜連絡速度", "goal": "下請け先としての運用品質を伝える。", "script": "案件を受けるか断るかは、早く判断しないと機会損失になります。弊社には完成発注の前段階で、この仕様なら受けられるか、この納期なら危ないか、この加工ならサンプルが必要かを確認する使い方ができます。", "cue": "レスの速さ＝判断の速さ、と置き換える。", "avoid": "単なるチャット対応の話で終わらせない。"}, "16": {"title": "沈黙｜中間確認", "goal": "相手の温度感と懸念を拾う。", "script": "ここまでで、どう思われましたか。御社で使うとしたら、通常案件ではなく、どのあたりの案件で可能性がありそうでしょうか。", "cue": "相手が話した言葉を次のヒアリングに使う。", "avoid": "沈黙を怖がって説明を足しすぎない。"}, "17": {"title": "進め方｜相談から納品まで", "goal": "初回運用のイメージを具体化する。", "script": "初回は大きな案件で試す必要はありません。過去に対応しづらかった案件、または直近で外注先に迷いそうな案件を1件だけ共有ください。アイテム、数量、納期、加工内容、データ有無、希望単価を見れば、弊社向きか判定できます。", "cue": "ハードルを下げる。『1件だけ』を強調。", "avoid": "初回から継続契約の話にしない。"}, "18": {"title": "実績｜信頼の置き方", "goal": "大手実績の権威性を出しつつ、商流不安を煽らない。", "script": "弊社は自社でアパレル・グッズ・特殊加工の製造経験を持ち、制作会社様経由でエンタメ系グッズ、イベント物販、法人ノベルティ、ユニフォーム系案件に関与してきました。名前を前に出していただく必要はありません。御社の裏側で形にします。", "cue": "大手名は補助。メインは下請け適性。", "avoid": "直接取引・直接提案を匂わせない。"}, "19": {"title": "転換｜ここからが本題", "goal": "説明から案件判定へ移行する。", "script": "ここからが本題です。弊社が良い会社かどうかではなく、御社の下請けラインとして使えるかを確認させてください。", "cue": "商談の主導権をヒアリングへ切り替える。", "avoid": "ここでまた会社紹介に戻らない。"}, "20": {"title": "H.01｜現体制の改善点", "goal": "現行外注先の不満ではなく、出しづらい案件を抽出する。", "script": "現在の製造パートナー様はアイテムごとに分けていますか。それともある程度まとめて依頼できる先がありますか。改善したい点は、ロット、納期、コスト、クオリティ、連絡速度のどこが一番近いでしょうか。", "cue": "相手が既存先を守る発言をしても肯定する。", "avoid": "既存先の悪口を引き出さない。"}, "21": {"title": "H.02｜優先順位の確認", "goal": "案件判定で見るべき軸を3つに絞る。", "script": "新しい下請け製造先を使う際に、御社が重視するものを3つ選ぶとしたら、単価、納期、品質、連絡速度、30枚以下への対応、10営業日以下への対応、特殊加工への対応、初回取り決めの明確さのどれでしょうか。", "cue": "ここで相手の評価基準を確定する。", "avoid": "全部できます、で流さない。"}, "22": {"title": "H.03｜強化領域", "goal": "グッズ・ノベルティ・IP・イベント物販のどこに広げたいか掴む。", "script": "今後強化したいのは、法人ノベルティ、イベントグッズ、アーティスト・IP系、アパレル物販のどの領域でしょうか。タレント、アーティスト、キャラクター、アニメ系は、納期がイベント日や公開日に固定されやすく、製造判断が難しくなりやすいです。", "cue": "対象業界の確認を自然に挟む。", "avoid": "エンド開拓支援に話を広げすぎない。"}, "23": {"title": "H.04｜リアル展開の確認", "goal": "必要な場合だけポップアップ・販売周辺支援に触れる。", "script": "リアルイベントやポップアップの構想がある場合、制作だけでなく納品形態や販売現場まで条件が変わります。まずは制作・納品側の条件を確認し、必要であれば周辺対応も切り分けます。", "cue": "補助カードとして出す。前面には出さない。", "avoid": "ポップアップ支援が主商材に見えないようにする。"}, "24": {"title": "H.05｜直近案件の有無", "goal": "今すぐ一次判定へ接続する。", "script": "直近でライン逼迫の案件はありますか。具体的な案件が控えているなら、アイテム、数量、納期、加工内容を聞かせてください。今すぐ対応可否の一次判定に入れます。", "cue": "『ある』ならクロージングを前倒し。", "avoid": "ない場合に詰めない。過去案件へ切り替える。"}, "25": {"title": "H.06｜単価感", "goal": "価格比較案件か、SAGULIFE向き案件かを見極める。", "script": "価格が合うかどうかも、案件を1件見た方が早いです。標準品の大量ロットで価格比較する会社ではありません。30枚以下、10営業日以下、特殊加工、アパレル系の条件で価値が出るかを見ます。", "cue": "安さではなく、拾える案件で勝負。", "avoid": "相場を無理に合わせる約束をしない。"}, "26": {"title": "クロージング｜過去案件1件→48h判定", "goal": "次回日程ではなく、判断材料を作らせる。", "script": "本日の結論としては、次回の商談日を先に決めるより、まず案件データを1件見た方が早いです。過去に対応しづらかった案件、または直近で外注先に迷いそうな案件を1件だけ共有ください。弊社側で48時間以内に、対応可否、概算費用、想定納期、リスク箇所、サンプル要否、既存先との使い分けを整理して返します。", "cue": "商談の出口は『日程』ではなく『実弾1件』。", "avoid": "検討します、で終わらせない。"}, "27": {"title": "Thank You｜余韻", "goal": "商流を守る製造サブラインとして記憶させる。", "script": "本日はありがとうございました。このあと簡易共有フォーマットをお送りします。まずは1件だけ、過去に対応しづらかった案件を共有ください。そこで弊社が使えるか、正直に判定します。", "cue": "最後まで『正直に判定』で締める。", "avoid": "最後に強い売り込みを追加しない。"}};
-  const startedAt = Date.now();
-  const pad = n => String(n).padStart(2, '0');
-  const $ = id => document.getElementById(id);
-  function getCurrent() { try { return current || 1; } catch(e) { return Number(document.querySelector('.slide.active')?.dataset.slide || 1); } }
-  function getTotal() { return Object.keys(notesData).length; }
-  function plain(html) { const d = document.createElement('div'); d.innerHTML = html || ''; return d.textContent || d.innerText || ''; }
-  function fmtTime(ms) { const s = Math.floor(ms/1000); return pad(Math.floor(s/60)) + ':' + pad(s%60); }
-  function showToast(msg) { const t=$('toast'); if(!t) return; t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 1200); }
-  function writeNote(n) {
-    const d = notesData[n] || notesData[1]; if(!d) return;
-    $('scriptKicker').textContent = 'SLIDE ' + pad(n) + ' / ' + getTotal();
-    $('scriptTitle').textContent = d.title || '';
-    $('scriptGoal').textContent = d.goal || '';
-    $('scriptMain').textContent = d.script || '';
-    $('scriptCue').textContent = d.cue || '';
-    $('scriptAvoid').textContent = d.avoid || '';
-    const pct = (n / getTotal()) * 100;
-    if($('miniProgress')) $('miniProgress').style.width = pct + '%';
-    try { localStorage.setItem('sagulifeDeckState', JSON.stringify({ current:n, total:getTotal(), updatedAt:Date.now(), elapsed:fmtTime(Date.now()-startedAt), note:d })); } catch(e) {}
+/* ============================================================
+   DATA
+============================================================ */
+const slides = [
+  {
+    num:1, headline:"本日の目的", title:"タイトル｜判断する場としての入口",
+    section:"導入",
+    first:"本日は売り込みではありません。御社のノベルティ・販促物の運用を1社で巻き取れるか、判断する場にできればと思っています。",
+    goal:"商談の入口を『売り込み』ではなく『1社で巻き取れるかの判定』と再定義する。",
+    script:"本日は売り込みではありません。アパレル、小物、ノベルティ、OEMといった案件を、企画段階から制作まで1社で巻き取れるかを判断する場にできればと思っています。複数業者で分散している調整工数を、御社側で減らせる余地があるかを見ていきます。",
+    cue:"冒頭で売り込まない。『判断する場』と言い切る。",
+    avoid:"いきなり実績や強みを並べない。",
+    ask:"本日お時間をいただいたきっかけは、どのあたりの課題からでしょうか？"
+  },
+  {
+    num:2, headline:"お電話の続きから", title:"Q.01｜興味理由の確認",
+    section:"アイスブレイク",
+    first:"先日のお電話でご興味を持っていただいた理由を先に教えてください。",
+    goal:"相手が何に反応したのかを先に喋らせる。",
+    script:"先日のお電話でご興味を持っていただいた理由は、新しい制作会社を探していたというより、複数の発注先を回す手間、もしくは特定の案件で詰まった経験があったからではないかと見ています。実際のところ、近いでしょうか。",
+    cue:"回答を遮らない。ここで相手の課題語彙を拾う。",
+    avoid:"いきなり会社説明に入らない。",
+    ask:"近いでしょうか？"
+  },
+  {
+    num:3, headline:"いま、調達はどう動いていますか", title:"Q.02｜現在の調達フロー",
+    section:"アイスブレイク",
+    first:"ノベルティや販促物の調達は、現在どんなフローで動いていますか？",
+    goal:"現発注フローの形（一括／分散／代理店経由）を把握する。",
+    script:"御社では、ノベルティや販促物の調達は、社内のマーケ部で一括して動かしておられますか。それとも部署ごと、案件ごとに個別の業者を使われていますか。代理店経由が多いケースもあると思います。実際の体制を教えてください。",
+    cue:"形式を聞いてから次へ。否定しない。",
+    avoid:"既存の代理店・業者を悪く言わない。",
+    ask:"発注先は、案件ごとに変えていますか？それともまとめている先がありますか？"
+  },
+  {
+    num:4, headline:"どこで詰まっていますか", title:"Q.03｜詰まり条件の特定",
+    section:"アイスブレイク",
+    first:"ロット・納期・特殊加工・企画段階のどこで詰まりやすいですか？",
+    goal:"小ロット・短納期・特殊加工・企画提案のどれが刺さるか判定する。",
+    script:"案件の中で詰まりやすいのは、ロット感、たとえば30枚以下の少量、納期、たとえば10営業日以下、特殊加工、たとえば刺繍×スタッズやストーン加工、もしくは企画段階の提案、このあたりではないかと思っています。御社ではどの部分が出やすいでしょうか。",
+    cue:"条件を具体化して記憶を引き出す。",
+    avoid:"『何か困っていますか？』のような浅い質問にしない。",
+    ask:"この中で近いものはありますか？"
+  },
+  {
+    num:5, headline:"販促物の使いどころ", title:"Q.04｜配布シーンの確認",
+    section:"アイスブレイク",
+    first:"ノベルティの主な配布シーンは、記念品・販促・採用・周年・展示会、どれが多いですか？",
+    goal:"配布シーンを掴み、提案の角度を決める。",
+    script:"ノベルティや販促物の主な配布シーンは、記念品、購入特典、株主優待、販促配布、採用、周年、展示会、このあたりだと思います。御社ではどれが多いでしょうか。シーンによって、アイテム選定も納期の組み立ても、提案の角度が変わります。",
+    cue:"用途を聞いてから提案軸を決める。",
+    avoid:"代理店業務に踏み込みすぎない。",
+    ask:"今後増やしたい配布シーンはどれですか？"
+  },
+  {
+    num:6, headline:"思い当たる案件は？", title:"記憶喚起｜抱え込んだ案件",
+    section:"問題提起",
+    first:"直近で、複数業者の調整で時間を取られた案件はありましたか？",
+    goal:"担当者の隠れ工数を本人の言葉で引き出す。",
+    script:"直近で、見積を複数業者から取って比較する、デザインは別途依頼する、加工は別工場に発注する、納期調整が交錯する、そういう案件で時間を取られたものがあったのではないかと思っています。30枚以下、10営業日以下、特殊加工が絡む案件は、特に重くなりやすいです。",
+    cue:"断言気味に置いて、相手に修正させる。",
+    avoid:"責めているように言わない。",
+    ask:"近いものはありましたか？"
+  },
+  {
+    num:7, headline:"分散発注の見えないコスト", title:"業界の現実｜分散発注の見えないコスト",
+    section:"業界の現実",
+    first:"見積・仕様・進行・検品・納品、全部つなぐのは担当者本人です。",
+    goal:"分散発注に伴う隠れ工数を構造として可視化する。",
+    script:"ノベルティや販促物の発注では、企画は社内、デザインはA社、製造はB社、印刷はC社、納品はD社、というように案件ごとに業者が変わりがちです。結果として、見積取得、仕様調整、進行管理、検品、納品、すべての連結を担当者本人がやることになります。",
+    cue:"『御社が悪い』ではなく『構造が重い』で話す。",
+    avoid:"価格訴求に落とさない。",
+    ask:"この調整、実際のところ重く感じることはありますか？"
+  },
+  {
+    num:8, headline:"その手間、必要でしたか？", title:"感情スライド｜その手間、必要でしたか？",
+    section:"業界の現実",
+    first:"その手間、本当に必要でしたか？",
+    goal:"相手に分散発注の損失感を持たせる。",
+    script:"その手間、本当に必要だったでしょうか。1社で巻き取れるはずの案件を、業者ごとに切って発注する構造になっていないか、ここを一度見直してみてもいい時期かもしれません。",
+    cue:"沈黙を使う。相手が話す余白を作る。",
+    avoid:"すぐ次の説明へ逃げない。",
+    ask:"（沈黙。相手が話し始めるまで待つ）"
+  },
+  {
+    num:9, headline:"連結点は、いつも担当者本人", title:"業界構造｜集中点は担当者",
+    section:"業界の現実",
+    first:"分散発注の集中点は、いつも担当者本人です。",
+    goal:"分散発注の重さは個人に集中する、と構造化する。",
+    script:"業者がアイテムごとに分かれている構造の場合、見積、仕様確認、納期調整、品質確認、納品連絡、すべての連結点は担当者本人になります。担当者の業務時間が、案件の規模に比例しないコストとして溜まっていきます。",
+    cue:"相手の苦労を代弁する。",
+    avoid:"SAGULIFEが全部を解決すると言い切らない。",
+    ask:"この隠れた調整コスト、感覚的に重いと感じますか？"
+  },
+  {
+    num:10, headline:"ワンストップ・パートナー", title:"ポジショニング｜ワンストップ・パートナー",
+    section:"SAGULIFEとは",
+    first:"SAGULIFEは、アパレル・グッズ制作を1社で巻き取るワンストップ・パートナーです。",
+    goal:"SAGULIFE＝1社で巻き取る、と定義する。",
+    script:"SAGULIFEは、アパレル、小物、ノベルティ、OEMまでを1社で巻き取るワンストップ・パートナーです。企画段階からのご相談も、アイテム単体のスポット依頼も、両方対応します。御社側の窓口を、案件ごとではなく、1社・1担当に集約することが目的です。",
+    cue:"『1社で巻き取る』を短く強く。",
+    avoid:"便利屋に見える言い方を避ける。",
+    ask:"御社の今の発注先の数は、何社くらいですか？"
+  },
+  {
+    num:11, headline:"アパレルから小物まで、1社で", title:"サービス概要｜対応領域",
+    section:"サービス",
+    first:"アパレル・小物・ノベルティ・OEM、すべて1社で。",
+    goal:"対応領域の幅を提示する。",
+    script:"対応領域は、Tシャツ・パーカーなどのアパレル印刷、キーホルダーをはじめとする小物、法人ノベルティ、OEM、そして刺繍・スタッズ・ストーン加工です。他社様では業者が分かれがちなアパレルと小物の制作を、弊社ですべてまとめてお任せいただける点が特徴です。アパレルだけ、キーホルダーだけ、というスポット依頼も対応します。",
+    cue:"列挙で終わらず、ワンストップへ戻す。",
+    avoid:"全部できます、で終わらせない。",
+    ask:"御社でよく出るアイテムは何が多いですか？"
+  },
+  {
+    num:12, headline:"3つの決め手", title:"3つの強み｜全体像",
+    section:"3つの強み",
+    first:"御社にとってのメリットは3つ。ワンストップ・小ロット＋特殊加工・柔軟な対応。",
+    goal:"覚えるべきUSPを3つに絞る。",
+    script:"御社にとってのメリットは3つです。1つ目はワンストップ対応。アパレルから小物まで1社で完結します。2つ目は小ロットと特殊加工。少量からの制作も、刺繍×スタッズ・ストーンなどの特殊加工も対応します。3つ目は柔軟な対応。企画段階からの伴走も、単発のスポット依頼も両方OKです。",
+    cue:"数字より3語『ワンストップ・小ロット＋特殊加工・柔軟』を残す。",
+    avoid:"強みを全部盛りしない。",
+    ask:"この3つの中で、今いちばん必要なのはどれですか？"
+  },
+  {
+    num:13, headline:"窓口を1本に", title:"強み01｜ワンストップ対応",
+    section:"3つの強み",
+    first:"アパレルから小物まで1社で完結。窓口は1本に。",
+    goal:"窓口1本化のメリットを明確化する。",
+    script:"他社様では、アパレル、印刷、小物、OEMで業者が分かれがちです。SAGULIFEはこれを1社でまとめて受けます。御社側は、見積、仕様、進行、納期、検品、すべての窓口が1本になります。複数業者との調整工数が、ここでまるごと削減できます。",
+    cue:"『1社で完結』を中心に置く。",
+    avoid:"便利さの羅列で終わらせない。",
+    ask:"現在、ノベルティ案件1件あたり何社くらい関わっていますか？"
+  },
+  {
+    num:14, headline:"断られがちな案件こそ", title:"強み02｜小ロット＋特殊加工",
+    section:"3つの強み",
+    first:"30枚以下からの少ロット、刺繍×スタッズ・ストーンなど、断られがちな案件も。",
+    goal:"断られがちな案件の受け皿を印象づける。",
+    script:"目安として、30枚以下からの少ロット制作も対応します。必要な数量だけで制作する形なので、在庫リスクを抑えた展開がしやすい構造です。特殊加工では、刺繍にスタッズを付ける加工、ジルコニアストーンをあしらったデザインなど、一般工場が断る加工もご相談ください。加工位置、素材、数量、納期を見たうえで対応可否を判定します。",
+    cue:"『全部やります』ではなく『判定します』で信用を作る。",
+    avoid:"できない可能性を隠さない。",
+    ask:"特殊加工で断られた案件は過去にありましたか？"
+  },
+  {
+    num:15, headline:"企画からスポットまで", title:"強み03｜柔軟な対応",
+    section:"3つの強み",
+    first:"企画段階の相談も、単発のスポット依頼も、両方OK。",
+    goal:"依頼の入口を広く取れることを示す。",
+    script:"案件によっては、企画段階からのご相談を受けます。逆に、アパレルだけ、キーホルダーだけ、ノベルティ1点だけ、というスポット依頼も対応します。10営業日以下の短納期案件は、アイテム、数量、加工の組み合わせを見て、最短で3〜4日対応のケースもあります。ただし無理な約束はせず、現実的に判定します。",
+    cue:"スピードは約束ではなく判定力として語る。",
+    avoid:"常に3〜4日で可能と言わない。",
+    ask:"直近で、10営業日以下の短納期案件はありましたか？"
+  },
+  {
+    num:16, headline:"ここまで、どう思われましたか", title:"沈黙｜中間確認",
+    section:"確認",
+    first:"ここまでで、どう思われましたか？",
+    goal:"相手の温度感と懸念を拾う。",
+    script:"ここまでで、どう思われましたか。御社で使うとしたら、どのあたりの案件で可能性がありそうでしょうか。",
+    cue:"相手が話した言葉を次のヒアリングに使う。",
+    avoid:"沈黙を怖がって説明を足しすぎない。",
+    ask:"どのあたりの案件で可能性がありそうでしょうか？"
+  },
+  {
+    num:17, headline:"ヒアリングから納品まで", title:"進め方｜ヒアリングから納品まで",
+    section:"進め方",
+    first:"ヒアリング → 仕様確定 → サンプル制作 → 本生産 → 納品。",
+    goal:"制作フローを可視化する。",
+    script:"進め方はシンプルです。ヒアリング、仕様確定、サンプル制作、本生産、納品の5段階です。初回は大きな案件で試す必要はありません。直近で動いている、もしくは過去に対応しづらかった案件を1件だけ共有いただければ、ヒアリングを行い、対応可否・概算費用・想定納期・仕様提案を整理して返します。",
+    cue:"ハードルを下げる。『1件だけ』を強調。",
+    avoid:"初回から継続契約の話にしない。",
+    ask:"1件だけ試してみることはできそうですか？"
+  },
+  {
+    num:18, headline:"ブランドを形にしてきた", title:"実績｜信頼の置き方",
+    section:"実績",
+    first:"エンタメ・法人・ブランド立ち上げまで、幅広く対応。",
+    goal:"実績の幅で安心材料を提供する。",
+    script:"対応実績としては、エンタメ業界では芸能事務所、インフルエンサー、アイドルイベント物販。法人向けではユニフォーム制作、法人ノベルティ。さらに、ブランド立ち上げ段階からの伴走支援も多数あります。アパレル制作からOEM対応まで、お客様の成長段階に合わせたサポート実績があります。",
+    cue:"実績の幅を示し、御社の領域に寄せる。",
+    avoid:"特定の社名・案件に踏み込みすぎない。",
+    ask:"御社で最も多い配布対象は、どういう層になりますか？"
+  },
+  {
+    num:19, headline:"ここからが本題", title:"転換｜ここからが本題",
+    section:"ヒアリング",
+    first:"ここからが本題です。御社で使えるかを確認させてください。",
+    goal:"説明から案件判定へ移行する。",
+    script:"ここからが本題です。弊社が良い会社かどうかではなく、御社のノベルティ・販促物の制作パートナーとして使えるかを確認させてください。",
+    cue:"商談の主導権をヒアリングへ切り替える。",
+    avoid:"ここでまた会社紹介に戻らない。",
+    ask:"ここからいくつか確認させてください。よろしいですか？"
+  },
+  {
+    num:20, headline:"重い工程は、どこですか", title:"H.01｜現体制の重い工程",
+    section:"ヒアリング",
+    first:"現在の発注フローで、時間がかかっている工程はどこですか？",
+    goal:"発注フロー内の隠れ工数を抽出する。",
+    script:"現在の発注フローのうち、時間がかかっている工程はどこでしょうか。見積取得、仕様調整、デザイン依頼、特殊加工の発注、納期調整、検品、納品、このどれが一番重く感じますか。",
+    cue:"工程を具体化して相手に選ばせる。",
+    avoid:"既存業者の悪口を引き出さない。",
+    ask:"この中で、一番重く感じている工程はどれですか？"
+  },
+  {
+    num:21, headline:"重視する軸を3つ", title:"H.02｜優先順位の確認",
+    section:"ヒアリング",
+    first:"新しい制作パートナーに求めるものを3つ選ぶとしたら？",
+    goal:"案件判定で見るべき軸を3つに絞る。",
+    script:"新しい制作パートナーを使う際に、御社が重視するものを3つ選ぶとしたら、企画力、単価、納期、品質、窓口の手間の少なさ、30枚以下への対応、10営業日以下への対応、特殊加工への対応、このどれでしょうか。",
+    cue:"ここで相手の評価基準を確定する。",
+    avoid:"全部できます、で流さない。",
+    ask:"この中から3つ選ぶとしたら？"
+  },
+  {
+    num:22, headline:"次に伸ばしたい領域", title:"H.03｜強化領域",
+    section:"ヒアリング",
+    first:"今後強化したいのは、記念品・販促・採用・周年・展示会、どれ？",
+    goal:"今後伸ばしたい配布シーンを把握する。",
+    script:"今後強化したい領域は、記念品、購入特典、株主優待、販促配布、採用、周年、展示会、このどれが近いでしょうか。配布シーンによって、アイテムの仕様も、納期の組み立ても変わってきます。",
+    cue:"対象シーンの確認を自然に挟む。",
+    avoid:"範囲外の領域に話を広げすぎない。",
+    ask:"強化したい領域はどれが一番近いですか？"
+  },
+  {
+    num:23, headline:"ブランドの一貫性", title:"H.04｜ブランド一貫性の確認",
+    section:"ヒアリング",
+    first:"ブランドガイドラインに沿った制作が必要な案件はありますか？",
+    goal:"デザイン提案・ブランド一貫性の必要度を確認する。",
+    script:"ノベルティや販促物の制作で、ブランドガイドラインに沿った制作、もしくはブランドの世界観を反映した制作が必要な案件はありますか。SAGULIFEは単なる製造ではなく、ブランドの世界観をどう形にするかという視点で提案を行います。アイテム間でデザインや品質を統一したい案件には、特に貢献できます。",
+    cue:"ブランド管理の重要性を確認する。",
+    avoid:"デザイン提案を売り込みすぎない。",
+    ask:"ブランド一貫性が重要な案件は、どれくらいの割合ですか？"
+  },
+  {
+    num:24, headline:"直近で動いている案件は？", title:"H.05｜直近案件の有無",
+    section:"ヒアリング",
+    first:"直近で動いている案件はありますか？今すぐ対応可否を判定できます。",
+    goal:"今すぐ一次判定へ接続する。",
+    script:"直近で動いている案件、もしくは控えている案件はありますか。具体的な案件があれば、アイテム、数量、納期、加工内容を伺ったうえで、対応可否を判定します。",
+    cue:"『ある』ならクロージングを前倒し。",
+    avoid:"ない場合に詰めない。過去案件へ切り替える。",
+    ask:"直近で控えている案件があれば、今すぐ判定します。ありますか？"
+  },
+  {
+    num:25, headline:"単価は、1件見た方が早い", title:"H.06｜単価感",
+    section:"ヒアリング",
+    first:"単価感は、案件を1件見た方が早いです。",
+    goal:"価格比較案件か、SAGULIFE向き案件かを見極める。",
+    script:"価格が合うかどうかも、案件を1件見た方が早いです。標準品の大量ロットで価格比較する会社ではありません。少ロット、特殊加工、企画段階からの相談、こういった条件で価値が出るかを見ます。",
+    cue:"安さではなく、拾える案件で勝負。",
+    avoid:"相場を無理に合わせる約束をしない。",
+    ask:"Tシャツ1枚・30枚ロット・1箇所プリントで、今の発注単価はどのくらいですか？"
+  },
+  {
+    num:26, headline:"案件を1件、共有ください", title:"クロージング｜1件共有→対応可否＋仕様提案",
+    section:"NEXT STEP",
+    first:"次回日程より先に、案件を1件ください。",
+    goal:"次回日程ではなく、判断材料を作らせる。",
+    script:"本日の結論としては、次回の商談日を先に決めるより、案件を1件見た方が早いです。直近で動いている、もしくは過去に対応しづらかった案件を1件だけ共有ください。弊社側でヒアリングを行い、対応可否、概算費用、想定納期、仕様提案、サンプル要否を整理して返します。",
+    cue:"商談の出口は『日程』ではなく『実弾1件』。",
+    avoid:"検討します、で終わらせない。",
+    ask:"1件だけ共有いただけますか？対応可否と仕様提案を整理して返します。"
+  },
+  {
+    num:27, headline:"ありがとうございました", title:"Thank You｜余韻",
+    section:"クロージング",
+    first:"本日はありがとうございました。まずは1件、正直に判定します。",
+    goal:"ワンストップ・パートナーとして記憶させる。",
+    script:"本日はありがとうございました。このあと簡易共有フォーマットをお送りします。まずは1件だけ、直近で動いている、もしくは過去に対応しづらかった案件を共有ください。弊社が使えるか、正直に判定し、提案を返します。",
+    cue:"最後まで『正直に判定』で締める。",
+    avoid:"最後に強い売り込みを追加しない。",
+    ask:"（名刺交換・フォーマット送付の約束をして終了）"
   }
-  function togglePanel(force) { const p=$('scriptPanel'); if(!p) return; p.classList.toggle('open', typeof force==='boolean' ? force : !p.classList.contains('open')); writeNote(getCurrent()); }
-  function toggleOverview(force) { const o=$('overview'); if(!o) return; o.classList.toggle('open', typeof force==='boolean' ? force : !o.classList.contains('open')); }
-  function buildOverview() {
-    const grid=$('overviewGrid'); if(!grid) return; grid.innerHTML='';
-    Object.keys(notesData).forEach(k=>{ const n=Number(k), d=notesData[k]; const card=document.createElement('div'); card.className='overview-card'; card.innerHTML='<div class="overview-num">SLIDE '+pad(n)+'</div><div class="overview-title">'+(d.title||'')+'</div><div class="overview-sub">'+(d.goal||'')+'</div>'; card.onclick=()=>{ goToSlide(n); toggleOverview(false); }; grid.appendChild(card); });
-  }
-  function copyCurrent() { const n=getCurrent(); const d=notesData[n]; if(!d) return; const txt = `SLIDE ${pad(n)}｜${d.title}
+];
 
-目的：${d.goal}
+const TOTAL = slides.length;
+let cur = 0;
+let audWin = null;
+let startedAt = Date.now();
 
-台本：${d.script}
+/* ============================================================
+   IFRAME — slide HTML injected into the preview iframe
+   The audience window also uses this same HTML.
+============================================================ */
+function buildSlidePageHTML(highlightIndex) {
+  const slideBlocks = slides.map((s, i) => {
+    const isActive = i === highlightIndex;
+    const bg = (i === 0 || i === 26) ? 'dark-hero' :
+               [7,8,9,10,11,12,13,14,15,17,18,19,25,26].includes(i) ? 'dark-q' : 'light-q';
+    const accent = s.section === "ヒアリング" ? '#3b82f6' :
+                   s.section === "業界の現実" ? '#FFB84D' : '#00D4A8';
 
-合図：${d.cue}
+    // スライド1：キャッチコピー型カバー
+    if (i === 0) {
+      return `<div class="slide dark-hero${isActive ? ' active' : ''}" id="sl${i}" data-slide="${i}">
+      <div class="smesh">
+        <div class="blob" style="width:500px;height:500px;top:-120px;right:-100px;background:${accent};opacity:0.10"></div>
+        <div class="blob" style="width:280px;height:280px;bottom:-80px;left:-50px;background:#FFB84D;opacity:0.07"></div>
+      </div>
+      <div class="hero-brand">株式会社SAGULIFE</div>
+      <div class="hero-cover">
+        <h1 class="hero-h">ブランドの世界観を、<br><span class="hero-accent">1社で。</span></h1>
+      </div>
+    </div>`;
+    }
 
-注意：${d.avoid}`; navigator.clipboard?.writeText(txt).then(()=>showToast('このスライドの台本をコピーしました')); }
-  function copyAll() { const txt = Object.keys(notesData).map(k=>{ const d=notesData[k]; return `SLIDE ${pad(Number(k))}｜${d.title}
-目的：${d.goal}
-台本：${d.script}
-合図：${d.cue}
-注意：${d.avoid}`; }).join('
+    return `<div class="slide ${bg}${isActive ? ' active' : ''}" id="sl${i}" data-slide="${i}">
+      <div class="smesh">
+        <div class="blob" style="width:500px;height:500px;top:-120px;right:-100px;background:${accent};opacity:0.10"></div>
+        <div class="blob" style="width:280px;height:280px;bottom:-80px;left:-50px;background:#FFB84D;opacity:0.07"></div>
+      </div>
+      <div class="content${bg === 'light-q' ? ' light' : ''}">
+        <div class="slide-num">${String(i+1).padStart(2,'0')} / ${String(TOTAL).padStart(2,'0')}</div>
+        <h2 class="slide-h">${s.headline}</h2>
+        <div class="divider" style="background:linear-gradient(90deg,${accent},${accent === '#00D4A8' ? '#FFB84D' : '#00D4A8'})"></div>
+        <p class="slide-body">${s.first}</p>
+      </div>
+    </div>`;
+  }).join('');
 
----
-
-'); navigator.clipboard?.writeText(txt).then(()=>showToast('全台本をコピーしました')); }
-  function openPresenterWindow() {
-    const w = window.open('', 'sagulife_presenter_view', 'width=560,height=760,noopener=false');
-    if(!w) { showToast('ポップアップがブロックされました'); return; }
-    const css = `body{margin:0;background:#050b16;color:#e5e7eb;font-family:-apple-system,BlinkMacSystemFont,'Noto Sans JP',sans-serif}.wrap{padding:22px}.k{color:#00D4A8;font-size:12px;letter-spacing:.12em;font-weight:900}h1{font-family:serif;font-size:24px;line-height:1.35;margin:8px 0 18px;color:#fff}.box{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);border-radius:18px;padding:16px;margin:12px 0}.label{color:#94a3b8;font-size:11px;letter-spacing:.1em;font-weight:900;margin-bottom:8px}.main{font-size:17px;line-height:1.9;color:#fff}.txt{font-size:14px;line-height:1.8}.safe{border-left:4px solid #00D4A8}.warn{border-left:4px solid #FFB84D}.footer{position:sticky;bottom:0;background:#050b16;border-top:1px solid rgba(255,255,255,.1);padding:12px 22px;color:#94a3b8;font-size:12px}`;
-    w.document.open();
-    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>SAGULIFE 登壇者ビュー</title><style>${css}</style>
-
-<style id="sagulife-wse-style-controls-css">
-  .wse-hash-chip{font-variant-numeric:tabular-nums;color:#00D4A8!important;border-color:rgba(0,212,168,.30)!important;background:rgba(0,212,168,.08)!important;min-width:58px;text-align:center;font-weight:800}
-  .wse-url-btn{color:#FFB84D!important}
-  .wse-mode-chip{color:#cbd5e1!important;background:rgba(255,255,255,.045)!important}
-  .wse-bottom-hint{position:fixed;left:22px;bottom:27px;z-index:120;display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(6,12,24,.56);backdrop-filter:blur(14px);box-shadow:0 12px 32px rgba(0,0,0,.24);font-family:'Noto Sans JP',sans-serif;font-size:12px;color:#94a3b8;letter-spacing:.02em;pointer-events:none}
-  .wse-bottom-hint b{color:#00D4A8;font-weight:900}.wse-bottom-hint .sep{width:1px;height:14px;background:rgba(255,255,255,.14)}
-  .wse-presenter-mode .script-panel{display:block}.wse-presenter-mode .script-panel:not(.open){display:block}.wse-presenter-mode .nav-controls{opacity:.72}.wse-presenter-mode .presenter-tools{right:22px}
-  @media (max-width:900px){.wse-bottom-hint{display:none}.presenter-tools{left:12px;right:auto;top:12px;max-width:calc(100vw - 24px);overflow-x:auto}.presenter-chip,.presenter-btn{white-space:nowrap}.script-panel{right:12px;top:70px;width:calc(100vw - 24px)}}
+  return `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SAGULIFE プレゼン</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--accent:#00D4A8;--amber:#FFB84D;--bg:#040c1a;--ink:#f1f5f9;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:'Noto Sans JP',sans-serif;color:var(--ink)}
+.deck{position:relative;width:100%;height:100%}
+.slide{position:absolute;inset:0;opacity:0;transform:scale(.96);transition:opacity .6s ease,transform .6s ease;pointer-events:none;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.slide.active{opacity:1;transform:scale(1);pointer-events:all}
+.dark-q{background:linear-gradient(135deg,#040c1a,#0d1a2e)}
+.dark-hero{background:linear-gradient(135deg,#020811,#071221)}
+.light-q{background:linear-gradient(135deg,#e8f4f0,#f0f7f5)}
+.smesh{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);animation:drift 14s ease-in-out infinite alternate}
+@keyframes drift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(40px,-40px) scale(1.1)}}
+.content{position:relative;z-index:2;width:min(900px,calc(100% - 80px));padding:3rem;display:flex;flex-direction:column;gap:.8rem}
+.content.light .sec-label{color:#475569}
+.content.light .slide-num{color:#64748b}
+.content.light .slide-h{color:#0f172a}
+.content.light .slide-body{color:#475569}
+.sec-label{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.slide-num{position:absolute;bottom:24px;right:30px;font-size:11px;letter-spacing:.12em;color:rgba(255,255,255,.38);font-weight:700}
+.content.light .slide-num{color:rgba(0,0,0,.3)}
+.slide-h{font-family:'Noto Serif JP',serif;font-size:clamp(1.8rem,3.8vw,3rem);font-weight:900;line-height:1.25;color:var(--ink)}
+.divider{width:48px;height:3px;border-radius:2px;margin:.2rem 0}
+.slide-body{font-size:clamp(.9rem,1.3vw,1.05rem);line-height:1.9;color:var(--muted);max-width:760px}
+.hero-brand{position:absolute;top:26px;left:34px;z-index:3;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.05em}
+.hero-cover{position:relative;z-index:2;width:min(960px,calc(100% - 80px));padding:3rem;display:flex;flex-direction:column;justify-content:center}
+.hero-h{font-family:'Noto Serif JP',serif;font-size:clamp(2.4rem,5.5vw,4.6rem);font-weight:900;line-height:1.35;color:var(--ink);letter-spacing:.02em}
+.hero-accent{color:var(--accent)}
+/* mini nav dots */
+.dots{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.18);cursor:pointer;transition:background .25s,transform .25s}
+.dot.a{background:var(--accent);transform:scale(1.35)}
+.prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--amber));z-index:20;transition:width .3s;box-shadow:0 0 16px rgba(0,212,168,.5)}
 </style>
+</head>
+<body>
+<div class="prog" id="prog"></div>
+<div class="deck" id="deck">${slideBlocks}</div>
+<div class="dots" id="dots"></div>
+<script>
+var cur=${highlightIndex},tot=${TOTAL};
+var deck=document.getElementById('deck');
+var prog=document.getElementById('prog');
+var dotsEl=document.getElementById('dots');
+for(var i=0;i<tot;i++){var d=document.createElement('div');d.className='dot'+(i===cur?' a':'');(function(idx){d.onclick=function(){go(idx);if(window.parent&&window.parent!==window)window.parent.postMessage({type:'slide-click',slide:idx},'*')};})(i);dotsEl.appendChild(d)}
+function go(n){if(n<0)n=tot-1;if(n>=tot)n=0;document.querySelector('.slide.active')&&document.querySelector('.slide.active').classList.remove('active');document.getElementById('sl'+n).classList.add('active');document.querySelectorAll('.dot').forEach(function(d,i){d.classList.toggle('a',i===n)});prog.style.width=((n+1)/tot*100)+'%';cur=n;if(window.parent&&window.parent!==window)window.parent.postMessage({type:'slide-nav',slide:n},'*')}
+go(cur);
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' ')go(cur+1);if(e.key==='ArrowLeft')go(cur-1)});
+window.addEventListener('message',function(e){if(e.data&&e.data.type==='goto')go(e.data.slide)});
+<\/script>
+</body>
+</html>`;
+}
 
-</head><body><div class="wrap"><div class="k" id="k"></div><h1 id="t"></h1><div class="box safe"><div class="label">目的</div><div class="txt" id="g"></div></div><div class="box"><div class="label">話す台本</div><div class="main" id="m"></div></div><div class="box"><div class="label">合図</div><div class="txt" id="c"></div></div><div class="box warn"><div class="label">封印・注意</div><div class="txt" id="a"></div></div></div><div class="footer" id="f">main deckと自動同期</div><script>function u(){try{const s=JSON.parse(localStorage.getItem('sagulifeDeckState')||'{}'); if(!s.note)return; document.getElementById('k').textContent='SLIDE '+String(s.current).padStart(2,'0')+' / '+s.total+' ｜ '+(s.elapsed||'00:00'); document.getElementById('t').textContent=s.note.title||''; document.getElementById('g').textContent=s.note.goal||''; document.getElementById('m').textContent=s.note.script||''; document.getElementById('c').textContent=s.note.cue||''; document.getElementById('a').textContent=s.note.avoid||''; document.getElementById('f').textContent='更新: '+new Date(s.updatedAt).toLocaleTimeString();}catch(e){}} setInterval(u,250); u();<\/script>
-<div class="wse-bottom-hint" id="wseBottomHint"><b>#s0</b><span class="sep"></span><span>URLでスライド位置を保持</span><span class="sep"></span><span>S:台本 / O:一覧 / P:別窓 / F:全画面</span></div>
+/* ============================================================
+   STATE & SYNC
+============================================================ */
+function go(n) {
+  if(n < 0) n = TOTAL - 1;
+  if(n >= TOTAL) n = 0;
+  cur = n;
+  updatePreview();
+  updateCues();
+  updateProgress();
+  syncAudience();
+  try { history.replaceState(null,'','#s'+n); } catch(e){}
+}
 
+function updatePreview() {
+  const frame = document.getElementById('slideFrame');
+  // Post message to iframe to switch slide
+  try {
+    frame.contentWindow.postMessage({ type:'goto', slide: cur }, '*');
+  } catch(e) {
+    // fallback: rewrite iframe
+    const doc = frame.contentDocument || frame.contentWindow.document;
+    doc.open(); doc.write(buildSlidePageHTML(cur)); doc.close();
+  }
+}
 
-<script id="sagulife-wse-style-router-js">
-(function(){
-  const totalSlides = () => document.querySelectorAll('.slide').length || 1;
-  const clamp = (n) => Math.max(1, Math.min(totalSlides(), Number(n) || 1));
-  const pad = (n) => String(n).padStart(2, '0');
-  let internalHashWrite = false;
-  const q = new URLSearchParams(location.search);
-
-  function hashToSlide(hash){
-    const m = String(hash || location.hash || '').match(/^#s(\d+)$/i);
-    if(!m) return null;
-    return clamp(Number(m[1]) + 1);
-  }
-  function slideToHash(n){ return '#s' + (clamp(n) - 1); }
-  function activeSlide(){
-    const active = document.querySelector('.slide.active');
-    return clamp(active ? active.dataset.slide : (window.current || 1));
-  }
-  function setHashForSlide(n, mode='replace'){
-    const h = slideToHash(n);
-    if(location.hash === h) return;
-    internalHashWrite = true;
-    const url = location.pathname + location.search + h;
-    if(mode === 'push') history.pushState(null, '', url); else history.replaceState(null, '', url);
-    setTimeout(()=>{ internalHashWrite = false; }, 0);
-  }
-  function refreshHud(n){
-    n = clamp(n || activeSlide());
-    const h = slideToHash(n);
-    const hashChip = document.getElementById('hashChip');
-    const hint = document.getElementById('wseBottomHint');
-    const counter = document.getElementById('counter');
-    if(hashChip) hashChip.textContent = h;
-    if(hint) hint.querySelector('b').textContent = h;
-    if(counter) counter.textContent = n + ' / ' + totalSlides() + ' · ' + h;
-    document.documentElement.dataset.currentHash = h;
-  }
-  function ensureControls(){
-    const tools = document.querySelector('.presenter-tools');
-    if(tools && !document.getElementById('hashChip')){
-      tools.insertAdjacentHTML('afterbegin', '<span class="presenter-chip wse-hash-chip" id="hashChip">#s0</span>');
-      const help = document.getElementById('btnHelp');
-      const btnHtml = '<button class="presenter-btn wse-url-btn" id="btnCopyUrl" title="現在のスライドURLをコピー">URL</button><button class="presenter-btn" id="btnSpeakerMode" title="台本を開いた登壇者モード">登壇</button>';
-      if(help) help.insertAdjacentHTML('beforebegin', btnHtml); else tools.insertAdjacentHTML('beforeend', btnHtml);
-    }
-    document.getElementById('btnCopyUrl')?.addEventListener('click', () => {
-      const n = activeSlide(); setHashForSlide(n);
-      const url = location.href;
-      if(navigator.clipboard){ navigator.clipboard.writeText(url).then(()=>window.__saguToast?.('現在スライドのURLをコピーしました') || console.log('copied')); }
-      else { prompt('URLをコピーしてください', url); }
-    }, { once:false });
-    document.getElementById('btnSpeakerMode')?.addEventListener('click', () => {
-      document.body.classList.toggle('wse-presenter-mode');
-      const on = document.body.classList.contains('wse-presenter-mode');
-      document.getElementById('scriptPanel')?.classList.toggle('open', on);
-      window.__saguToast?.(on ? '登壇者モードをONにしました' : '登壇者モードをOFFにしました');
-    }, { once:false });
-  }
-  function patchToast(){
-    window.__saguToast = function(msg){
-      const t = document.getElementById('toast');
-      if(!t) return;
-      t.textContent = msg;
-      t.classList.add('show');
-      clearTimeout(window.__saguToastTimer);
-      window.__saguToastTimer = setTimeout(()=>t.classList.remove('show'), 1300);
-    };
-  }
-  function patchNavigation(){
-    const baseGo = window.goToSlide;
-    if(typeof baseGo === 'function' && !baseGo.__wsePatched){
-      const wrapped = function(n, opts){
-        n = clamp(n);
-        baseGo(n);
-        setHashForSlide(n, opts && opts.push ? 'push' : 'replace');
-        refreshHud(n);
-        if(typeof window.writeNote === 'function') { try { window.writeNote(n); } catch(e){} }
-      };
-      wrapped.__wsePatched = true;
-      window.goToSlide = wrapped;
-    }
-    const baseChange = window.changeSlide;
-    if(typeof baseChange === 'function' && !baseChange.__wsePatched){
-      const wrappedChange = function(dir){
-        const n0 = activeSlide();
-        let n = n0 + Number(dir || 0);
-        if(n < 1) n = totalSlides();
-        if(n > totalSlides()) n = 1;
-        window.goToSlide ? window.goToSlide(n) : baseChange(dir);
-        refreshHud(n);
-      };
-      wrappedChange.__wsePatched = true;
-      window.changeSlide = wrappedChange;
-    }
-  }
-  function handleHashChange(){
-    if(internalHashWrite) return;
-    const target = hashToSlide(location.hash);
-    if(target) {
-      if(window.goToSlide) window.goToSlide(target, { fromHash:true });
-      refreshHud(target);
-    }
-  }
-  function bindKeys(){
-    document.addEventListener('keydown', (e)=>{
-      if(e.target && ['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
-      if(e.key === 'Home'){ e.preventDefault(); window.goToSlide?.(1); }
-      if(e.key === 'End'){ e.preventDefault(); window.goToSlide?.(totalSlides()); }
-      if(e.key === 'PageDown'){ e.preventDefault(); window.changeSlide?.(1); }
-      if(e.key === 'PageUp'){ e.preventDefault(); window.changeSlide?.(-1); }
-      if(e.key === 'u' || e.key === 'U'){
-        e.preventDefault();
-        const n = activeSlide(); setHashForSlide(n);
-        navigator.clipboard?.writeText(location.href).then(()=>window.__saguToast?.('URLをコピーしました'));
-      }
-    }, true);
-  }
-  function init(){
-    patchToast(); ensureControls(); patchNavigation(); bindKeys();
-    let initial = hashToSlide(location.hash);
-    if(!initial){ initial = 1; setHashForSlide(1); }
-    if(window.goToSlide) window.goToSlide(initial, { fromHash:true });
-    refreshHud(initial);
-    window.addEventListener('hashchange', handleHashChange);
-    window.addEventListener('popstate', handleHashChange);
-    if(q.get('presenter') === '1' || q.get('notes') === '1'){
-      document.body.classList.add('wse-presenter-mode');
-      document.getElementById('scriptPanel')?.classList.add('open');
-    }
-  }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
-})();
-</script>
-
-
-<script id="sagulife-v10-clean-main-js">
-(function(){
-  const focusSlides = [2,3,4,5,6,8,13,14,15,16,19,20,21,22,23,24,25,26];
-  const balancedSlides = [7,9,10,11,12,17,18];
-  focusSlides.forEach(n => document.querySelector('.slide[data-slide="'+n+'"]')?.classList.add('slide-focus-center'));
-  balancedSlides.forEach(n => document.querySelector('.slide[data-slide="'+n+'"]')?.classList.add('slide-balanced'));
-
-  function cleanMain(){
-    document.body.classList.remove('wse-presenter-mode');
-    ['scriptPanel','overview','helpPop','blackout'].forEach(id=>{
-      const el = document.getElementById(id);
-      if(!el) return;
-      el.classList.remove('open','on','show');
-      el.setAttribute('aria-hidden','true');
-    });
-  }
-  function openNotesWindowOnly(){
-    // Existing deck already defines the separate presenter window. Trigger its original button handler safely.
-    const btn = document.getElementById('btnPresenter');
-    if(btn){ btn.click(); return; }
-    // Fallback: minimal notes window reading synchronized localStorage.
-    const w = window.open('', 'sagulife_presenter_view', 'width=560,height=760,noopener=false');
-    if(!w) return;
-    w.document.open();
-    w.document.write(`<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>SAGULIFE 台本</title><style>
-      body{margin:0;background:#050b16;color:#e5e7eb;font-family:-apple-system,BlinkMacSystemFont,'Noto Sans JP',sans-serif}.wrap{padding:22px}.k{color:#00D4A8;font-size:12px;letter-spacing:.12em;font-weight:900}h1{font-family:serif;font-size:24px;line-height:1.35;margin:8px 0 18px;color:#fff}.box{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);border-radius:18px;padding:16px;margin:12px 0}.label{color:#94a3b8;font-size:11px;letter-spacing:.1em;font-weight:900;margin-bottom:8px}.main{font-size:17px;line-height:1.9;color:#fff;white-space:pre-wrap}.txt{font-size:14px;line-height:1.8;white-space:pre-wrap}.safe{border-left:4px solid #00D4A8}.warn{border-left:4px solid #FFB84D}.footer{position:sticky;bottom:0;background:#050b16;border-top:1px solid rgba(255,255,255,.1);padding:12px 22px;color:#94a3b8;font-size:12px}
-    </style></head><body><div class="wrap"><div class="k" id="k"></div><h1 id="t"></h1><div class="box safe"><div class="label">目的</div><div class="txt" id="g"></div></div><div class="box"><div class="label">話す台本</div><div class="main" id="m"></div></div><div class="box"><div class="label">合図</div><div class="txt" id="c"></div></div><div class="box warn"><div class="label">封印・注意</div><div class="txt" id="a"></div></div></div><div class="footer" id="f">main deckと自動同期</div><script>
-      function u(){try{const s=JSON.parse(localStorage.getItem('sagulifeDeckState')||'{}'); if(!s.note)return; document.getElementById('k').textContent='SLIDE '+String(s.current).padStart(2,'0')+' / '+s.total+' ｜ '+(s.elapsed||'00:00'); document.getElementById('t').textContent=s.note.title||''; document.getElementById('g').textContent=s.note.goal||''; document.getElementById('m').textContent=s.note.script||''; document.getElementById('c').textContent=s.note.cue||''; document.getElementById('a').textContent=s.note.avoid||''; document.getElementById('f').textContent='更新: '+new Date(s.updatedAt).toLocaleTimeString();}catch(e){}} setInterval(u,250); u();
-    <\/script>
-<style id="sagulife-v11-presenter-console-css">
-  /* v11: WSE-style presenter console. Default URL = presenter view. Customer window = ?view=customer */
-  html, body { height:100%; }
-  body.v11-presenter {
-    background:#07111f !important;
-    color:#f8fafc !important;
-    overflow:hidden !important;
-    font-family:'Noto Sans JP', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
-  }
-  body.v11-presenter > .deck,
-  body.v11-presenter > .mouse-spotlight,
-  body.v11-presenter > .mini-progress,
-  body.v11-presenter > .presenter-tools,
-  body.v11-presenter > .script-panel,
-  body.v11-presenter > .overview,
-  body.v11-presenter > .blackout,
-  body.v11-presenter > .help-pop,
-  body.v11-presenter > .toast,
-  body.v11-presenter > .nav-controls,
-  body.v11-presenter .wse-bottom-hint {
-    display:none !important;
-    visibility:hidden !important;
-    opacity:0 !important;
-    pointer-events:none !important;
-  }
-  body.v11-customer #saguPresenterConsole { display:none !important; }
-  #saguPresenterConsole{
-    position:fixed;
-    inset:0;
-    z-index:999999;
-    display:grid;
-    grid-template-columns:minmax(620px, 1.45fr) minmax(420px, .95fr);
-    gap:0;
-    background:linear-gradient(135deg,#050b14 0%,#0a1524 52%,#08111f 100%);
-    color:#f8fafc;
-  }
-  .sagu-console-preview{
-    min-width:0;
-    padding:18px 18px 24px;
-    border-right:1px solid rgba(148,163,184,.18);
-    display:flex;
-    flex-direction:column;
-    gap:18px;
-  }
-  .sagu-console-label{
-    font-size:13px;
-    line-height:1.4;
-    color:#94a3b8;
-    font-weight:900;
-    letter-spacing:.05em;
-  }
-  .sagu-preview-shell{
-    flex:1;
-    min-height:0;
-    background:#020617;
-    border:1px solid rgba(148,163,184,.24);
-    box-shadow:0 24px 70px rgba(0,0,0,.45);
-    position:relative;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
-  }
-  .sagu-preview-topbar{
-    position:absolute;
-    top:0; left:0; right:0;
-    height:72px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:18px 28px;
-    background:linear-gradient(180deg,rgba(0,0,0,.74),rgba(0,0,0,.22));
-    pointer-events:none;
-    z-index:3;
-    border-top:3px solid #f97316;
-  }
-  .sagu-preview-brand{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    color:#f8fafc;
-    font-size:11px;
-    font-weight:900;
-    letter-spacing:.12em;
-  }
-  .sagu-preview-logo{
-    width:70px;height:36px;
-    display:flex;align-items:center;justify-content:center;
-    border:1px solid rgba(249,115,22,.7);
-    background:rgba(124,45,18,.24);
-    color:#fff;
-    font-weight:900;
-    letter-spacing:.16em;
-  }
-  .sagu-preview-auto{
-    color:#fb923c;
-    font-size:11px;
-    letter-spacing:.16em;
-    font-weight:900;
-  }
-  .sagu-preview-iframe{
-    width:100%;
-    height:100%;
-    border:0;
-    background:#020617;
-  }
-  .sagu-preview-counter{
-    position:absolute;
-    right:28px;
-    bottom:22px;
-    z-index:3;
-    color:rgba(248,250,252,.88);
-    font-weight:900;
-    letter-spacing:.1em;
-    font-size:13px;
-    pointer-events:none;
-  }
-  .sagu-console-side{
-    min-width:0;
-    padding:34px 22px 28px 28px;
-    overflow:auto;
-    background:linear-gradient(180deg,rgba(15,23,42,.48),rgba(2,6,23,.22));
-  }
-  .sagu-title{
-    font-size:28px;
-    line-height:1.25;
-    font-weight:900;
-    margin:0 0 10px;
-    letter-spacing:-.02em;
-  }
-  .sagu-subtitle{
-    color:#94a3b8;
-    line-height:1.7;
-    font-size:14px;
-    margin:0 0 20px;
-  }
-  .sagu-warn{
-    border:1px solid rgba(248,113,113,.5);
-    background:rgba(127,29,29,.28);
-    color:#fecaca;
-    padding:15px 17px;
-    font-weight:900;
-    line-height:1.7;
-    margin:18px 0 16px;
-  }
-  .sagu-btn-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:14px 12px;
-    margin:14px 0;
-  }
-  .sagu-btn{
-    appearance:none;
-    border:1px solid rgba(148,163,184,.22);
-    background:linear-gradient(180deg,rgba(30,41,59,.72),rgba(15,23,42,.74));
-    color:#f8fafc;
-    min-height:58px;
-    padding:12px 16px;
-    font-weight:900;
-    font-size:17px;
-    cursor:pointer;
-    transition:transform .18s ease, border-color .18s ease, background .18s ease;
-  }
-  .sagu-btn:hover{
-    transform:translateY(-1px);
-    border-color:rgba(251,146,60,.66);
-    background:linear-gradient(180deg,rgba(51,65,85,.80),rgba(15,23,42,.90));
-  }
-  .sagu-btn.primary{
-    background:linear-gradient(135deg,#f97316,#c2410c);
-    border-color:rgba(251,146,60,.8);
-    box-shadow:0 12px 34px rgba(249,115,22,.18);
-  }
-  .sagu-status{
-    border:1px solid rgba(148,163,184,.22);
-    background:rgba(15,23,42,.64);
-    padding:16px 17px;
-    margin:14px 0 18px;
-    color:#cbd5e1;
-    line-height:1.8;
-    font-size:14px;
-  }
-  .sagu-status strong{ color:#fb923c; font-size:18px; }
-  .sagu-note{
-    border:1px solid rgba(249,115,22,.70);
-    background:linear-gradient(180deg,rgba(67,26,10,.62),rgba(35,18,12,.70));
-    box-shadow:0 20px 50px rgba(0,0,0,.22);
-    padding:20px;
-    margin-top:16px;
-  }
-  .sagu-note-head{
-    display:grid;
-    grid-template-columns:1fr auto;
-    gap:12px;
-    align-items:start;
-    padding-bottom:16px;
-    border-bottom:1px solid rgba(251,146,60,.20);
-  }
-  .sagu-note-kicker{
-    color:#fdba74;
-    font-size:15px;
-    font-weight:900;
-    letter-spacing:.16em;
-    margin-bottom:5px;
-  }
-  .sagu-note-title{
-    color:#fff;
-    font-size:20px;
-    line-height:1.35;
-    font-weight:900;
-  }
-  .sagu-note-num{
-    width:48px;height:40px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border:1px solid rgba(251,146,60,.58);
-    color:#fdba74;
-    font-weight:900;
-    background:rgba(124,45,18,.34);
-  }
-  .sagu-note-tag{
-    color:#22d3ee;
-    letter-spacing:.14em;
-    font-size:12px;
-    font-weight:900;
-    margin:17px 0 12px;
-  }
-  .sagu-note-section{
-    margin-top:17px;
-  }
-  .sagu-note-label{
-    color:#94a3b8;
-    font-size:12px;
-    letter-spacing:.12em;
-    font-weight:900;
-    margin-bottom:7px;
-    border-top:1px solid rgba(148,163,184,.18);
-    padding-top:13px;
-  }
-  .sagu-note-text{
-    color:#f8fafc;
-    font-size:16px;
-    line-height:1.85;
-    font-weight:800;
-    white-space:pre-wrap;
-  }
-  .sagu-note-text.sub{
-    font-size:14px;
-    color:#cbd5e1;
-    font-weight:600;
-  }
-  .sagu-note-text.warn{
-    color:#fed7aa;
-  }
-  .sagu-mini-help{
-    color:#94a3b8;
-    font-size:13px;
-    line-height:1.7;
-  }
-  .sagu-mini-help b{ color:#fdba74; }
-  .sagu-customer-badge{
-    display:inline-block;
-    color:#fb923c;
-    font-weight:900;
-  }
-  @media(max-width:1080px){
-    #saguPresenterConsole{grid-template-columns:1fr;}
-    .sagu-console-preview{height:48vh;border-right:0;border-bottom:1px solid rgba(148,163,184,.18);}
-    .sagu-console-side{height:52vh;padding:22px;}
-  }
-</style>
-
-
-<script id="sagulife-v11-presenter-console-js">
-(function(){
-  const NOTES = {"1": {"title": "タイトル｜警戒を下げる入口", "goal": "相手に『競合ではなく裏側の製造ライン』だと最初に理解させる。", "script": "本日は、御社の既存外注先を置き換える話ではありません。短納期・小ロット・特殊加工・アパレル系など、通常ルートでは出しづらい案件を、弊社が裏側で拾えるかを判断する場にできればと思っています。", "cue": "冒頭で売り込まない。『判断する場』と言い切る。", "avoid": "企画から販売まで／ワンストップ／直接提案できます、は初回で出さない。"}, "2": {"title": "Q.01｜興味理由の確認", "goal": "相手が何に反応したのかを先に喋らせる。", "script": "先日のお電話でご興味を持っていただいた理由は、新しい制作会社を探していたというより、既存の製造先だけでは拾いづらい案件がどこかにあるからではないかと見ています。実際のところ、近いでしょうか。", "cue": "回答を遮らない。ここで相手の課題語彙を拾う。", "avoid": "いきなり会社説明に入らない。"}, "3": {"title": "Q.02｜内製／外注の確認", "goal": "現行の製造構造を把握し、置き換えではなくサブラインに寄せる。", "script": "グッズ・ノベルティの製造は、現在内製ラインをお持ちですか。それとも外部の製造パートナーにお任せされていますか。通常案件は今の体制で十分回っている前提で、出しづらい案件だけ確認させてください。", "cue": "既存先を否定しない。", "avoid": "既存先より弊社が良い、という比較にしない。"}, "4": {"title": "Q.03｜詰まり条件の特定", "goal": "小ロット・短納期・特殊加工のどれが刺さるか判定する。", "script": "ロット・納期・特殊加工・デザイン対応のどの部分で課題が出やすいでしょうか。30枚以下、10営業日以下、ジップ跨ぎプリント、刺繍×スタッズ、ジルコニアストーン接着のような案件で、出しづらかったものはありますか。", "cue": "条件を具体化して記憶を引き出す。", "avoid": "『何か困っていますか？』のような浅い質問にしない。"}, "5": {"title": "Q.04｜納品先・用途の確認", "goal": "イベント固定納期／法人ノベルティ／EC物販など、納期圧力の源泉を掴む。", "script": "納品先はイベント、法人、EC、ポップアップのどれが多いでしょうか。用途によって、弊社が一番貢献できるポイントが変わります。イベント日や公開日が決まっている案件ほど、製造側の判断が重要になります。", "cue": "用途を聞いてからSAGULIFEの使いどころへ接続。", "avoid": "ポップアップ支援を前面に出し過ぎない。"}, "6": {"title": "記憶喚起｜断った案件", "goal": "相手の脳内から『惜しかった案件』を引っ張り出す。", "script": "直近で、制作会社に断られた案件、もしくは御社側で受けたけれど製造先の都合でかなり重かった案件があったのではないかと思っています。30枚以下、10営業日以下、特殊加工あり。この条件のどれかに近いものはありますか。", "cue": "断言気味に置いて、相手に修正させる。", "avoid": "責めているように言わない。"}, "7": {"title": "業界の現実｜断っていませんか？", "goal": "機会損失を相手の課題として言語化する。", "script": "グッズ・ノベルティ制作会社様の場合、通常案件は既存の協力先で十分回るはずです。ただ、30枚以下、10営業日以下、アパレル絡み、特殊加工、仕様確定の遅れが重なると、急に製造先の選択肢が狭くなります。", "cue": "ここは『御社が悪い』ではなく『構造が重い』で話す。", "avoid": "価格訴求に落とさない。"}, "8": {"title": "感情スライド｜本当は取れたはず", "goal": "相手に過去案件の損失感を持たせる。", "script": "その案件、本当は取れたはずではないでしょうか。弊社が見たいのは、御社の通常案件ではなく、断るには惜しいが既存ルートでは重い案件です。", "cue": "沈黙を使う。相手が話す余白を作る。", "avoid": "すぐ次の説明へ逃げない。"}, "9": {"title": "業界構造｜調整負荷の集中", "goal": "制作会社側に見積・仕様確認・納期調整が集中する構造を示す。", "script": "エンド側は、商品選定も、デザイン反映も、アパレルも、小物も、短納期も、まとめて見てほしいと言います。一方で、実際の製造先はアイテムごとに分かれます。その結果、御社側が見積・仕様確認・納期調整・品質確認を抱える構造になります。", "cue": "相手の苦労を代弁する。", "avoid": "SAGULIFEが全部表に出る話にしない。"}, "10": {"title": "ポジショニング｜駆け込み寺", "goal": "通常案件ではなく、重い案件のサブラインだと定義する。", "script": "SAGULIFEは、御社の主導権を奪わずに案件を拾う黒子製造ラインです。通常案件は今まで通りで構いません。30枚以下、10営業日以下、特殊加工、アパレル系、断るには惜しい案件だけご相談ください。", "cue": "『置き換えではない』を短く強く。", "avoid": "便利屋に見える言い方を避ける。"}, "11": {"title": "サービス概要｜対応幅", "goal": "幅を見せるが、使いどころを絞る。", "script": "対応領域は、Tシャツ、パーカー、スウェット、バッグ、小物系グッズ、イベント物販向けアイテム、OEM、刺繍、スタッズ、ストーン加工などです。ただ、今日の話ではアイテムの幅より、使いどころが重要です。既存先が嫌がる数量・納期・加工の案件に使ってください。", "cue": "列挙で終わらず、使いどころへ戻す。", "avoid": "世界観づくりを強く言い過ぎない。"}, "12": {"title": "3つの強み｜全体像", "goal": "覚えるべきUSPを3つに絞る。", "script": "御社にとってのメリットは3つです。既存工場が嫌がる案件の逃げ道になること。アパレル系グッズを裏側で拾えること。案件を受けるか断るかの一次判定に使えることです。", "cue": "数字より『逃げ道・裏側・判定』の3語を残す。", "avoid": "強みを全部盛りしない。"}, "13": {"title": "強み01｜スピード", "goal": "短納期相談の入口を作る。", "script": "目安として、10営業日以下は短納期案件として見ます。内容によっては最短3〜4日で対応できるケースもあります。ただし無理な約束はせず、アイテム、数量、加工、データ状態を見て現実的に判定します。", "cue": "スピードは約束ではなく判定力として語る。", "avoid": "常に3〜4日で可能と言わない。"}, "14": {"title": "強み02｜特殊加工", "goal": "既存工場が嫌がる加工の受け皿を印象づける。", "script": "ジップ跨ぎプリント、刺繍×スタッズ、ジルコニアストーン接着など、通常工場が嫌がりやすい加工が対象になります。無条件にすべて対応できるわけではありませんが、加工位置、素材、数量、納期を見たうえで対応可否を判断します。", "cue": "『全部やります』の後に『判定します』で信用を作る。", "avoid": "できない可能性を隠さない。"}, "15": {"title": "強み03｜連絡速度", "goal": "下請け先としての運用品質を伝える。", "script": "案件を受けるか断るかは、早く判断しないと機会損失になります。弊社には完成発注の前段階で、この仕様なら受けられるか、この納期なら危ないか、この加工ならサンプルが必要かを確認する使い方ができます。", "cue": "レスの速さ＝判断の速さ、と置き換える。", "avoid": "単なるチャット対応の話で終わらせない。"}, "16": {"title": "沈黙｜中間確認", "goal": "相手の温度感と懸念を拾う。", "script": "ここまでで、どう思われましたか。御社で使うとしたら、通常案件ではなく、どのあたりの案件で可能性がありそうでしょうか。", "cue": "相手が話した言葉を次のヒアリングに使う。", "avoid": "沈黙を怖がって説明を足しすぎない。"}, "17": {"title": "進め方｜相談から納品まで", "goal": "初回運用のイメージを具体化する。", "script": "初回は大きな案件で試す必要はありません。過去に対応しづらかった案件、または直近で外注先に迷いそうな案件を1件だけ共有ください。アイテム、数量、納期、加工内容、データ有無、希望単価を見れば、弊社向きか判定できます。", "cue": "ハードルを下げる。『1件だけ』を強調。", "avoid": "初回から継続契約の話にしない。"}, "18": {"title": "実績｜信頼の置き方", "goal": "大手実績の権威性を出しつつ、商流不安を煽らない。", "script": "弊社は自社でアパレル・グッズ・特殊加工の製造経験を持ち、制作会社様経由でエンタメ系グッズ、イベント物販、法人ノベルティ、ユニフォーム系案件に関与してきました。名前を前に出していただく必要はありません。御社の裏側で形にします。", "cue": "大手名は補助。メインは下請け適性。", "avoid": "直接取引・直接提案を匂わせない。"}, "19": {"title": "転換｜ここからが本題", "goal": "説明から案件判定へ移行する。", "script": "ここからが本題です。弊社が良い会社かどうかではなく、御社の下請けラインとして使えるかを確認させてください。", "cue": "商談の主導権をヒアリングへ切り替える。", "avoid": "ここでまた会社紹介に戻らない。"}, "20": {"title": "H.01｜現体制の改善点", "goal": "現行外注先の不満ではなく、出しづらい案件を抽出する。", "script": "現在の製造パートナー様はアイテムごとに分けていますか。それともある程度まとめて依頼できる先がありますか。改善したい点は、ロット、納期、コスト、クオリティ、連絡速度のどこが一番近いでしょうか。", "cue": "相手が既存先を守る発言をしても肯定する。", "avoid": "既存先の悪口を引き出さない。"}, "21": {"title": "H.02｜優先順位の確認", "goal": "案件判定で見るべき軸を3つに絞る。", "script": "新しい下請け製造先を使う際に、御社が重視するものを3つ選ぶとしたら、単価、納期、品質、連絡速度、30枚以下への対応、10営業日以下への対応、特殊加工への対応、初回取り決めの明確さのどれでしょうか。", "cue": "ここで相手の評価基準を確定する。", "avoid": "全部できます、で流さない。"}, "22": {"title": "H.03｜強化領域", "goal": "グッズ・ノベルティ・IP・イベント物販のどこに広げたいか掴む。", "script": "今後強化したいのは、法人ノベルティ、イベントグッズ、アーティスト・IP系、アパレル物販のどの領域でしょうか。タレント、アーティスト、キャラクター、アニメ系は、納期がイベント日や公開日に固定されやすく、製造判断が難しくなりやすいです。", "cue": "対象業界の確認を自然に挟む。", "avoid": "エンド開拓支援に話を広げすぎない。"}, "23": {"title": "H.04｜リアル展開の確認", "goal": "必要な場合だけポップアップ・販売周辺支援に触れる。", "script": "リアルイベントやポップアップの構想がある場合、制作だけでなく納品形態や販売現場まで条件が変わります。まずは制作・納品側の条件を確認し、必要であれば周辺対応も切り分けます。", "cue": "補助カードとして出す。前面には出さない。", "avoid": "ポップアップ支援が主商材に見えないようにする。"}, "24": {"title": "H.05｜直近案件の有無", "goal": "今すぐ一次判定へ接続する。", "script": "直近でライン逼迫の案件はありますか。具体的な案件が控えているなら、アイテム、数量、納期、加工内容を聞かせてください。今すぐ対応可否の一次判定に入れます。", "cue": "『ある』ならクロージングを前倒し。", "avoid": "ない場合に詰めない。過去案件へ切り替える。"}, "25": {"title": "H.06｜単価感", "goal": "価格比較案件か、SAGULIFE向き案件かを見極める。", "script": "価格が合うかどうかも、案件を1件見た方が早いです。標準品の大量ロットで価格比較する会社ではありません。30枚以下、10営業日以下、特殊加工、アパレル系の条件で価値が出るかを見ます。", "cue": "安さではなく、拾える案件で勝負。", "avoid": "相場を無理に合わせる約束をしない。"}, "26": {"title": "クロージング｜過去案件1件→48h判定", "goal": "次回日程ではなく、判断材料を作らせる。", "script": "本日の結論としては、次回の商談日を先に決めるより、まず案件データを1件見た方が早いです。過去に対応しづらかった案件、または直近で外注先に迷いそうな案件を1件だけ共有ください。弊社側で48時間以内に、対応可否、概算費用、想定納期、リスク箇所、サンプル要否、既存先との使い分けを整理して返します。", "cue": "商談の出口は『日程』ではなく『実弾1件』。", "avoid": "検討します、で終わらせない。"}, "27": {"title": "Thank You｜余韻", "goal": "商流を守る製造サブラインとして記憶させる。", "script": "本日はありがとうございました。このあと簡易共有フォーマットをお送りします。まずは1件だけ、過去に対応しづらかった案件を共有ください。そこで弊社が使えるか、正直に判定します。", "cue": "最後まで『正直に判定』で締める。", "avoid": "最後に強い売り込みを追加しない。"}};
-  const TOTAL = Object.keys(NOTES).length || 27;
-  const params = new URLSearchParams(location.search);
-  const isCustomer = params.get('view') === 'customer' || params.get('customer') === '1' || params.get('display') === 'customer' || params.get('preview') === '1';
-  const pad = n => String(n).padStart(2,'0');
-  const clamp = n => Math.max(1, Math.min(TOTAL, Number(n)||1));
-  const slideToHash = n => '#s' + (clamp(n)-1);
-  const hashToSlide = h => {
-    const m = String(h || location.hash || '').match(/^#s(\d+)$/i);
-    return m ? clamp(Number(m[1]) + 1) : 1;
-  };
-  let current = hashToSlide(location.hash);
-  let customerWin = null;
-  let startedAt = Date.now();
-  let previewFrame = null;
-
-  function customerUrl(n, preview=false){
-    const url = new URL(location.href);
-    url.searchParams.set('view','customer');
-    if(preview) url.searchParams.set('preview','1');
-    url.searchParams.delete('presenter');
-    url.hash = slideToHash(n || current);
-    return url.toString();
-  }
-
-  function writeDeckState(){
-    const d = NOTES[String(current)] || NOTES["1"] || {};
-    try {
-      localStorage.setItem('sagulifeDeckState', JSON.stringify({
-        current,
-        total:TOTAL,
-        updatedAt:Date.now(),
-        elapsed:elapsedText(),
-        note:d
-      }));
-    } catch(e) {}
-  }
-
-  function elapsedText(){
-    const s = Math.floor((Date.now() - startedAt)/1000);
-    return pad(Math.floor(s/60)) + ':' + pad(s%60);
-  }
-
-  function setHash(n){
-    const h = slideToHash(n);
-    if(location.hash !== h) history.replaceState(null,'', location.pathname + location.search + h);
-  }
-
-  function updatePreview(){
-    if(previewFrame){
-      try {
-        previewFrame.contentWindow.postMessage({ type:'SAGULIFE_GO', slide:current }, '*');
-        previewFrame.contentWindow.location.hash = slideToHash(current);
-      } catch(e) {
-        previewFrame.src = customerUrl(current, true);
-      }
-    }
-  }
-
-  function syncCustomer(){
-    if(customerWin && !customerWin.closed){
-      try {
-        customerWin.postMessage({ type:'SAGULIFE_GO', slide:current }, '*');
-        customerWin.location.hash = slideToHash(current);
-      } catch(e) {}
-    }
-  }
-
-  function renderNote(){
-    const d = NOTES[String(current)] || NOTES["1"] || {};
-    const by = id => document.getElementById(id);
-    if(by('saguCurrentLabel')) by('saguCurrentLabel').textContent = slideToHash(current);
-    if(by('saguPreviewCounter')) by('saguPreviewCounter').textContent = pad(current) + ' / ' + pad(TOTAL);
-    if(by('saguNoteKicker')) by('saguNoteKicker').textContent = pad(current) + ' / AUTO';
-    if(by('saguNoteTitle')) by('saguNoteTitle').textContent = d.title || '';
-    if(by('saguNoteNum')) by('saguNoteNum').textContent = pad(current);
-    if(by('saguNoteGoal')) by('saguNoteGoal').textContent = d.goal || '';
-    if(by('saguNoteScript')) by('saguNoteScript').textContent = d.script || '';
-    if(by('saguNoteCue')) by('saguNoteCue').textContent = d.cue || '';
-    if(by('saguNoteAvoid')) by('saguNoteAvoid').textContent = d.avoid || '';
-    if(by('saguElapsed')) by('saguElapsed').textContent = elapsedText();
-    if(by('saguCustomerStatus')) by('saguCustomerStatus').innerHTML = customerWin && !customerWin.closed ? '<strong>起動中</strong>' : '<span class="sagu-customer-badge">未起動</span>';
-  }
-
-  function go(n){
-    current = clamp(n);
-    setHash(current);
-    writeDeckState();
-    renderNote();
-    updatePreview();
-    syncCustomer();
-  }
-
-  function openCustomer(){
-    const url = customerUrl(current, false);
-    customerWin = window.open(url, 'sagulife_customer_display', 'width=1440,height=900,noopener=false');
-    renderNote();
-    if(!customerWin) alert('ポップアップがブロックされています。ブラウザ設定を確認してください。');
-  }
-
-  function copyScript(){
-    const d = NOTES[String(current)] || NOTES["1"] || {};
-    const txt = `SLIDE ${pad(current)} / ${TOTAL}\n${d.title || ''}\n\n一言:\n${d.script || ''}\n\n合図:\n${d.cue || ''}`;
-    navigator.clipboard?.writeText(txt);
-  }
-
-  function restartMedia(){
-    [previewFrame?.contentWindow, customerWin].forEach(w => {
-      try {
-        if(!w || w.closed) return;
-        w.postMessage({ type:'SAGULIFE_RESTART_MEDIA' }, '*');
-      } catch(e) {}
-    });
-  }
-
-  function requestFullScreen(){
-    const el = document.documentElement;
-    if(el.requestFullscreen) el.requestFullscreen();
-  }
-
-  function buildPresenter(){
-    if(document.getElementById('saguPresenterConsole')) return;
-    document.body.classList.add('v11-presenter');
-    const root = document.createElement('main');
-    root.id = 'saguPresenterConsole';
-    root.innerHTML = `
-      <section class="sagu-console-preview">
-        <div class="sagu-console-label">発表者ビュー：この画面は共有しない</div>
-        <div class="sagu-preview-shell">
-          <div class="sagu-preview-topbar">
-            <div class="sagu-preview-brand"><div class="sagu-preview-logo">SAGU</div><div>LOCAL PRESENTATION<br>AUTO SYNC</div></div>
-            <div class="sagu-preview-auto">CUSTOMER PREVIEW / AUTO SYNC</div>
-          </div>
-          <iframe class="sagu-preview-iframe" id="saguPreviewFrame" src="${customerUrl(current, true)}"></iframe>
-          <div class="sagu-preview-counter" id="saguPreviewCounter">${pad(current)} / ${pad(TOTAL)}</div>
-        </div>
-      </section>
-      <aside class="sagu-console-side">
-        <h1 class="sagu-title">SAGULIFE 台本操作型プレゼン</h1>
-        <p class="sagu-subtitle">顧客には別ウィンドウだけを共有。こちらの画面には台本・操作・プレビューを表示。</p>
-        <div class="sagu-warn">⚠ この画面を共有すると台本が見えます。「顧客表示を開く」で開いた別ウィンドウだけ共有してください。</div>
-        <div class="sagu-btn-grid">
-          <button class="sagu-btn primary" id="saguOpenCustomer">顧客表示を開く</button>
-          <button class="sagu-btn" id="saguFullscreen">全画面</button>
-          <button class="sagu-btn" id="saguPrev">← 前へ</button>
-          <button class="sagu-btn" id="saguNext">次へ →</button>
-          <button class="sagu-btn" id="saguRestart">動画を最初から</button>
-          <button class="sagu-btn" id="saguCopy">質問をコピー</button>
-        </div>
-        <div class="sagu-status">
-          <div>顧客表示：<span id="saguCustomerStatus"><span class="sagu-customer-badge">未起動</span></span></div>
-          <div>経過時間：<strong id="saguElapsed">00:00</strong></div>
-          <div class="sagu-mini-help">操作：<b>Space / →</b> 次へ、<b>←</b> 前へ、<b>1〜9</b> 指定、<b>R</b> 動画再開</div>
-          <div>現在位置：<b id="saguCurrentLabel">${slideToHash(current)}</b></div>
-        </div>
-        <article class="sagu-note">
-          <div class="sagu-note-head">
-            <div>
-              <div class="sagu-note-kicker" id="saguNoteKicker">${pad(current)} / AUTO</div>
-              <div class="sagu-note-title" id="saguNoteTitle"></div>
-            </div>
-            <div class="sagu-note-num" id="saguNoteNum">${pad(current)}</div>
-          </div>
-          <div class="sagu-note-tag">PRESENTER SCRIPT / 商談台本</div>
-          <div class="sagu-note-section">
-            <div class="sagu-note-label">一言目</div>
-            <div class="sagu-note-text" id="saguNoteScript"></div>
-          </div>
-          <div class="sagu-note-section">
-            <div class="sagu-note-label">目的</div>
-            <div class="sagu-note-text sub" id="saguNoteGoal"></div>
-          </div>
-          <div class="sagu-note-section">
-            <div class="sagu-note-label">商談者への合図</div>
-            <div class="sagu-note-text sub" id="saguNoteCue"></div>
-          </div>
-          <div class="sagu-note-section">
-            <div class="sagu-note-label">封印・注意</div>
-            <div class="sagu-note-text sub warn" id="saguNoteAvoid"></div>
-          </div>
-        </article>
-      </aside>
-    `;
-    document.body.appendChild(root);
-    previewFrame = document.getElementById('saguPreviewFrame');
-    document.getElementById('saguOpenCustomer').addEventListener('click', openCustomer);
-    document.getElementById('saguFullscreen').addEventListener('click', requestFullScreen);
-    document.getElementById('saguPrev').addEventListener('click', () => go(current - 1));
-    document.getElementById('saguNext').addEventListener('click', () => go(current + 1));
-    document.getElementById('saguRestart').addEventListener('click', restartMedia);
-    document.getElementById('saguCopy').addEventListener('click', copyScript);
-    renderNote();
-    writeDeckState();
-    setInterval(renderNote, 500);
-  }
-
-  function initCustomer(){
-    document.body.classList.add('v11-customer');
-    if(!location.hash) history.replaceState(null,'', location.pathname + location.search + slideToHash(current));
-    setTimeout(() => {
-      if(typeof window.goToSlide === 'function') window.goToSlide(current);
-    }, 80);
-    window.addEventListener('message', e => {
-      const data = e.data || {};
-      if(data.type === 'SAGULIFE_GO'){
-        current = clamp(data.slide);
-        if(typeof window.goToSlide === 'function') window.goToSlide(current);
-        if(location.hash !== slideToHash(current)) history.replaceState(null,'', location.pathname + location.search + slideToHash(current));
-      }
-      if(data.type === 'SAGULIFE_RESTART_MEDIA'){
-        document.querySelectorAll('video,audio').forEach(m => {
-          try { m.currentTime = 0; m.play && m.play(); } catch(err) {}
-        });
-      }
-    });
-  }
-
-  function bindKeys(){
-    document.addEventListener('keydown', e => {
-      if(e.target && ['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
-      const k = e.key;
-      if(!isCustomer){
-        if(k === 'ArrowRight' || k === ' ' || k === 'PageDown') { e.preventDefault(); go(current+1); }
-        if(k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(current-1); }
-        if(k === 'Home') { e.preventDefault(); go(1); }
-        if(k === 'End') { e.preventDefault(); go(TOTAL); }
-        if(k === 'r' || k === 'R') { e.preventDefault(); restartMedia(); }
-        if(/^[1-9]$/.test(k)) { e.preventDefault(); go(Number(k)); }
-      }
-    }, true);
-    window.addEventListener('hashchange', () => {
-      const n = hashToSlide(location.hash);
-      if(n !== current) go(n);
-    });
-  }
-
-  function init(){
-    bindKeys();
-    if(isCustomer) initCustomer(); else buildPresenter();
-  }
-
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
-})();
-</script>
-
-
-<style id="sagulife-v12-customer-clean-css">
-  /* v12 hard customer-clean mode: customer must never see speaker cue/cue-copy text on question slides. */
-  html.sagu-customer-view .slide-light-q .content > p,
-  html.sagu-customer-view .slide-light-q .content > p.reveal,
-  body.v11-customer .slide-light-q .content > p,
-  body.v11-customer .slide-light-q .content > p.reveal,
-  body.v11-customer .presenter-only,
-  body.v11-customer .speaker-only,
-  body.v11-customer .cue-only,
-  body.v11-customer [data-presenter-only="true"]{
-    display:none !important;
-    visibility:hidden !important;
-    opacity:0 !important;
-    height:0 !important;
-    margin:0 !important;
-    padding:0 !important;
-    overflow:hidden !important;
-  }
-
-  /* keep customer question slides visually centered after removing cue text */
-  html.sagu-customer-view .slide-light-q .content,
-  body.v11-customer .slide-light-q .content{
-    min-height:100vh;
-    display:flex !important;
-    flex-direction:column !important;
-    justify-content:center !important;
-  }
-
-  html.sagu-customer-view .slide-light-q .accent-divider,
-  body.v11-customer .slide-light-q .accent-divider{
-    margin-bottom:0 !important;
-  }
-</style>
-<script id="sagulife-v12-customer-clean-js">
-(function(){
-  function isCustomerMode(){
-    try{
-      var p=new URLSearchParams(location.search);
-      return p.get('view')==='customer'||p.get('customer')==='1'||p.get('display')==='customer'||p.get('preview')==='1'||document.body.classList.contains('v11-customer');
-    }catch(e){ return document.body.classList.contains('v11-customer'); }
-  }
-  function hardCleanCustomer(){
-    if(!isCustomerMode()) return;
-    document.documentElement.classList.add('sagu-customer-view');
-    document.body.classList.add('v12-customer-clean');
-    // These paragraphs were speaker prompts/cue copy. Remove from customer DOM so they cannot appear in shared view.
-    document.querySelectorAll('.slide-light-q .content > p, .slide-light-q .content > p.reveal').forEach(function(el){
-      el.setAttribute('data-v12-removed-from-customer','true');
-      el.remove();
-    });
-    document.querySelectorAll('.presenter-tools,.script-panel,.wse-bottom-hint,.help-pop,.overview,.toast,.nav-controls,.mini-progress').forEach(function(el){
-      el.style.setProperty('display','none','important');
-      el.style.setProperty('visibility','hidden','important');
-      el.style.setProperty('opacity','0','important');
-      el.style.setProperty('pointer-events','none','important');
-    });
-  }
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded', function(){
-      hardCleanCustomer();
-      setTimeout(hardCleanCustomer,50);
-      setTimeout(hardCleanCustomer,500);
-    });
-  }else{
-    hardCleanCustomer();
-    setTimeout(hardCleanCustomer,50);
-    setTimeout(hardCleanCustomer,500);
-  }
-})();
-</script>
-
-</body></html>`);
-    w.document.close();
-  }
-
-  // Main screen remains clean. P opens notes in a separate window. Other presenter UI shortcuts are suppressed visually and logically.
-  document.addEventListener('keydown', function(e){
-    const tag = e.target && e.target.tagName;
-    if(['INPUT','TEXTAREA','SELECT'].includes(tag)) return;
-    const key = e.key || '';
-    if(key === 'p' || key === 'P'){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      cleanMain();
-      openNotesWindowOnly();
-      return;
-    }
-    if(['s','S','o','O','b','B','/'].includes(key)){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      cleanMain();
-      return;
-    }
-  }, true);
-
-  // Remove any UI that earlier scripts may try to open.
-  cleanMain();
-  setInterval(cleanMain, 500);
-})();
-</script>
-
-</body></html>`);
-    w.document.close();
-    writeNote(getCurrent());
-  }
-  function tick() { if($('timerChip')) $('timerChip').textContent = fmtTime(Date.now()-startedAt); try { const n=getCurrent(); const d=notesData[n]; localStorage.setItem('sagulifeDeckState', JSON.stringify({current:n,total:getTotal(),updatedAt:Date.now(),elapsed:fmtTime(Date.now()-startedAt),note:d})); } catch(e) {} }
-
-  // Wrap existing navigation so notes stay synchronized.
-  if (typeof goToSlide === 'function') { const baseGoToSlide = goToSlide; window.goToSlide = function(n) { baseGoToSlide(n); writeNote(n); }; }
-  if (typeof changeSlide === 'function') { const baseChangeSlide = changeSlide; window.changeSlide = function(dir) { baseChangeSlide(dir); setTimeout(()=>writeNote(getCurrent()), 0); }; }
-
-  $('btnNotes')?.addEventListener('click', ()=>togglePanel());
-  $('scriptClose')?.addEventListener('click', ()=>togglePanel(false));
-  $('btnPresenter')?.addEventListener('click', openPresenterWindow);
-  $('btnOverview')?.addEventListener('click', ()=>toggleOverview());
-  $('overviewClose')?.addEventListener('click', ()=>toggleOverview(false));
-  $('btnHelp')?.addEventListener('click', ()=>$('helpPop')?.classList.toggle('open'));
-  $('copyScript')?.addEventListener('click', copyCurrent);
-  $('copyAllScripts')?.addEventListener('click', copyAll);
-  document.addEventListener('keydown', (e)=>{
-    if ((e.target && ['INPUT','TEXTAREA'].includes(e.target.tagName))) return;
-    if (e.key === 's' || e.key === 'S') togglePanel();
-    if (e.key === 'p' || e.key === 'P') openPresenterWindow();
-    if (e.key === 'o' || e.key === 'O') toggleOverview();
-    if (e.key === 'f' || e.key === 'F') { if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
-    if (e.key === 'b' || e.key === 'B') $('blackout')?.classList.toggle('on');
-    if (e.key === '/') { e.preventDefault(); $('helpPop')?.classList.toggle('open'); }
-    if (e.key === 'Escape') { togglePanel(false); toggleOverview(false); $('helpPop')?.classList.remove('open'); $('blackout')?.classList.remove('on'); }
+function updateCues() {
+  document.querySelectorAll('.cue').forEach((el, i) => {
+    el.classList.toggle('active', i === cur);
+    if(i === cur) el.scrollIntoView({ block:'center', behavior:'smooth' });
   });
-  buildOverview(); writeNote(getCurrent()); setInterval(tick, 1000);
+}
+
+function updateProgress() {
+  document.getElementById('progressFill').style.width = ((cur+1)/TOTAL*100) + '%';
+}
+
+function syncAudience() {
+  if(audWin && !audWin.closed) {
+    try { audWin.postMessage({ type:'goto', slide: cur }, '*'); } catch(e){}
+  }
+  try { localStorage.setItem('sagu_slide', cur); } catch(e) {}
+}
+
+/* ============================================================
+   IFRAME INIT
+============================================================ */
+function initFrame() {
+  const frame = document.getElementById('slideFrame');
+  const html = buildSlidePageHTML(cur);
+  const blob = new Blob([html], { type:'text/html' });
+  const url = URL.createObjectURL(blob);
+  frame.src = url;
+  frame.onload = () => {
+    // listen for clicks inside the iframe
+    try {
+      frame.contentWindow.addEventListener('keydown', e => {
+        if(e.key === 'ArrowRight' || e.key === ' ') go(cur+1);
+        if(e.key === 'ArrowLeft') go(cur-1);
+      });
+    } catch(e){}
+  };
+}
+
+/* ============================================================
+   CUES BUILD
+============================================================ */
+function buildCues() {
+  const container = document.getElementById('cues');
+  container.innerHTML = '';
+  slides.forEach((s, i) => {
+    const el = document.createElement('article');
+    el.className = 'cue' + (i === cur ? ' active' : '');
+    el.dataset.i = i;
+    el.innerHTML = `
+      <div class="cue-top">
+        <div>
+          <div class="cue-no">${String(i+1).padStart(2,'0')} · ${s.section}</div>
+          <div class="cue-title">${s.title}</div>
+        </div>
+        <span class="cue-badge">${String(i+1).padStart(2,'0')}</span>
+      </div>
+      <div class="sec">
+        <div class="lab">一言目</div>
+        <div class="txt strong">${s.first}</div>
+      </div>
+      <div class="sec">
+        <div class="lab">目的</div>
+        <div class="txt goal">${s.goal}</div>
+      </div>
+      <div class="sec">
+        <div class="lab">話す台本</div>
+        <div class="txt script">${s.script}</div>
+      </div>
+      <div class="sec">
+        <div class="lab">合図・注意</div>
+        <div class="txt avoid">${s.cue}　/　⚠ ${s.avoid}</div>
+      </div>
+      <div class="sec">
+        <div class="lab">相手に投げる質問</div>
+        <div class="txt ask">${s.ask}</div>
+      </div>
+    `;
+    el.onclick = () => go(i);
+    container.appendChild(el);
+  });
+}
+
+/* ============================================================
+   CONTROLS
+============================================================ */
+document.getElementById('btnOpen').onclick = function() {
+  const html = buildSlidePageHTML(cur);
+  const blob = new Blob([html], { type:'text/html' });
+  const url = URL.createObjectURL(blob);
+  audWin = window.open(url, 'SAGU_AUDIENCE', 'noopener=false');
+  if(audWin) {
+    document.getElementById('audStatus').innerHTML = '顧客表示：<b>別タブで起動済み。その別タブだけ共有。</b>';
+    setTimeout(() => syncAudience(), 400);
+  } else {
+    document.getElementById('audStatus').innerHTML = '顧客表示：<b>⚠ ポップアップがブロックされました</b>';
+  }
+};
+
+document.getElementById('btnFull').onclick = function() {
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+  else document.exitFullscreen?.();
+};
+
+document.getElementById('btnPrev').onclick = () => go(cur - 1);
+document.getElementById('btnNext').onclick = () => go(cur + 1);
+
+document.getElementById('btnCopyAsk').onclick = async function() {
+  const s = slides[cur];
+  try { await navigator.clipboard.writeText(s.ask); toast('質問をコピーしました'); }
+  catch(e) { alert(s.ask); }
+};
+
+document.getElementById('btnCopyAll').onclick = async function() {
+  const txt = slides.map((s,i) =>
+    `SLIDE ${String(i+1).padStart(2,'0')}｜${s.title}\n目的：${s.goal}\n台本：${s.script}\n合図：${s.cue}\n注意：${s.avoid}\n質問：${s.ask}`
+  ).join('\n\n---\n\n');
+  try { await navigator.clipboard.writeText(txt); toast('全台本をコピーしました'); }
+  catch(e) { alert('コピーできませんでした'); }
+};
+
+/* ============================================================
+   KEYBOARD
+============================================================ */
+document.addEventListener('keydown', e => {
+  const tag = e.target?.tagName;
+  if(tag === 'INPUT' || tag === 'TEXTAREA') return;
+  if(e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(cur+1); }
+  if(e.key === 'ArrowLeft') { e.preventDefault(); go(cur-1); }
+  if(/^[1-9]$/.test(e.key)) go(parseInt(e.key,10)-1);
+  if(e.key === '0') go(9);
+});
+
+/* Listen for messages from iframe */
+window.addEventListener('message', e => {
+  if(!e.data) return;
+  if(e.data.type === 'slide-nav') { cur = e.data.slide; updateCues(); updateProgress(); syncAudience(); }
+  if(e.data.type === 'slide-click') { cur = e.data.slide; updateCues(); updateProgress(); syncAudience(); }
+});
+
+/* ============================================================
+   TIMER
+============================================================ */
+function pad(n){ return String(n).padStart(2,'0'); }
+setInterval(() => {
+  const sec = Math.floor((Date.now() - startedAt) / 1000);
+  document.getElementById('timer').textContent = pad(Math.floor(sec/60)) + ':' + pad(sec % 60);
+}, 500);
+
+/* ============================================================
+   TOAST
+============================================================ */
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(window._toastT);
+  window._toastT = setTimeout(() => el.classList.remove('show'), 1400);
+}
+
+/* ============================================================
+   HASH INIT
+============================================================ */
+(function init() {
+  const m = String(location.hash || '').match(/^#s(\d+)$/i);
+  if(m) cur = Math.min(Math.max(0, parseInt(m[1],10)), TOTAL-1);
+  buildCues();
+  initFrame();
+  updateProgress();
 })();
 </script>
-
-
-<div class="wse-bottom-hint" id="wseBottomHint"><b>#s0</b><span class="sep"></span><span>URLでスライド位置を保持</span><span class="sep"></span><span>S:台本 / O:一覧 / P:別窓 / F:全画面</span></div>
-
-
-<script id="sagulife-wse-style-router-js">
-(function(){
-  const totalSlides = () => document.querySelectorAll('.slide').length || 1;
-  const clamp = (n) => Math.max(1, Math.min(totalSlides(), Number(n) || 1));
-  const pad = (n) => String(n).padStart(2, '0');
-  let internalHashWrite = false;
-  const q = new URLSearchParams(location.search);
-
-  function hashToSlide(hash){
-    const m = String(hash || location.hash || '').match(/^#s(\d+)$/i);
-    if(!m) return null;
-    return clamp(Number(m[1]) + 1);
-  }
-  function slideToHash(n){ return '#s' + (clamp(n) - 1); }
-  function activeSlide(){
-    const active = document.querySelector('.slide.active');
-    return clamp(active ? active.dataset.slide : (window.current || 1));
-  }
-  function setHashForSlide(n, mode='replace'){
-    const h = slideToHash(n);
-    if(location.hash === h) return;
-    internalHashWrite = true;
-    const url = location.pathname + location.search + h;
-    if(mode === 'push') history.pushState(null, '', url); else history.replaceState(null, '', url);
-    setTimeout(()=>{ internalHashWrite = false; }, 0);
-  }
-  function refreshHud(n){
-    n = clamp(n || activeSlide());
-    const h = slideToHash(n);
-    const hashChip = document.getElementById('hashChip');
-    const hint = document.getElementById('wseBottomHint');
-    const counter = document.getElementById('counter');
-    if(hashChip) hashChip.textContent = h;
-    if(hint) hint.querySelector('b').textContent = h;
-    if(counter) counter.textContent = n + ' / ' + totalSlides() + ' · ' + h;
-    document.documentElement.dataset.currentHash = h;
-  }
-  function ensureControls(){
-    const tools = document.querySelector('.presenter-tools');
-    if(tools && !document.getElementById('hashChip')){
-      tools.insertAdjacentHTML('afterbegin', '<span class="presenter-chip wse-hash-chip" id="hashChip">#s0</span>');
-      const help = document.getElementById('btnHelp');
-      const btnHtml = '<button class="presenter-btn wse-url-btn" id="btnCopyUrl" title="現在のスライドURLをコピー">URL</button><button class="presenter-btn" id="btnSpeakerMode" title="台本を開いた登壇者モード">登壇</button>';
-      if(help) help.insertAdjacentHTML('beforebegin', btnHtml); else tools.insertAdjacentHTML('beforeend', btnHtml);
-    }
-    document.getElementById('btnCopyUrl')?.addEventListener('click', () => {
-      const n = activeSlide(); setHashForSlide(n);
-      const url = location.href;
-      if(navigator.clipboard){ navigator.clipboard.writeText(url).then(()=>window.__saguToast?.('現在スライドのURLをコピーしました') || console.log('copied')); }
-      else { prompt('URLをコピーしてください', url); }
-    }, { once:false });
-    document.getElementById('btnSpeakerMode')?.addEventListener('click', () => {
-      document.body.classList.toggle('wse-presenter-mode');
-      const on = document.body.classList.contains('wse-presenter-mode');
-      document.getElementById('scriptPanel')?.classList.toggle('open', on);
-      window.__saguToast?.(on ? '登壇者モードをONにしました' : '登壇者モードをOFFにしました');
-    }, { once:false });
-  }
-  function patchToast(){
-    window.__saguToast = function(msg){
-      const t = document.getElementById('toast');
-      if(!t) return;
-      t.textContent = msg;
-      t.classList.add('show');
-      clearTimeout(window.__saguToastTimer);
-      window.__saguToastTimer = setTimeout(()=>t.classList.remove('show'), 1300);
-    };
-  }
-  function patchNavigation(){
-    const baseGo = window.goToSlide;
-    if(typeof baseGo === 'function' && !baseGo.__wsePatched){
-      const wrapped = function(n, opts){
-        n = clamp(n);
-        baseGo(n);
-        setHashForSlide(n, opts && opts.push ? 'push' : 'replace');
-        refreshHud(n);
-        if(typeof window.writeNote === 'function') { try { window.writeNote(n); } catch(e){} }
-      };
-      wrapped.__wsePatched = true;
-      window.goToSlide = wrapped;
-    }
-    const baseChange = window.changeSlide;
-    if(typeof baseChange === 'function' && !baseChange.__wsePatched){
-      const wrappedChange = function(dir){
-        const n0 = activeSlide();
-        let n = n0 + Number(dir || 0);
-        if(n < 1) n = totalSlides();
-        if(n > totalSlides()) n = 1;
-        window.goToSlide ? window.goToSlide(n) : baseChange(dir);
-        refreshHud(n);
-      };
-      wrappedChange.__wsePatched = true;
-      window.changeSlide = wrappedChange;
-    }
-  }
-  function handleHashChange(){
-    if(internalHashWrite) return;
-    const target = hashToSlide(location.hash);
-    if(target) {
-      if(window.goToSlide) window.goToSlide(target, { fromHash:true });
-      refreshHud(target);
-    }
-  }
-  function bindKeys(){
-    document.addEventListener('keydown', (e)=>{
-      if(e.target && ['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
-      if(e.key === 'Home'){ e.preventDefault(); window.goToSlide?.(1); }
-      if(e.key === 'End'){ e.preventDefault(); window.goToSlide?.(totalSlides()); }
-      if(e.key === 'PageDown'){ e.preventDefault(); window.changeSlide?.(1); }
-      if(e.key === 'PageUp'){ e.preventDefault(); window.changeSlide?.(-1); }
-      if(e.key === 'u' || e.key === 'U'){
-        e.preventDefault();
-        const n = activeSlide(); setHashForSlide(n);
-        navigator.clipboard?.writeText(location.href).then(()=>window.__saguToast?.('URLをコピーしました'));
-      }
-    }, true);
-  }
-  function init(){
-    patchToast(); ensureControls(); patchNavigation(); bindKeys();
-    let initial = hashToSlide(location.hash);
-    if(!initial){ initial = 1; setHashForSlide(1); }
-    if(window.goToSlide) window.goToSlide(initial, { fromHash:true });
-    refreshHud(initial);
-    window.addEventListener('hashchange', handleHashChange);
-    window.addEventListener('popstate', handleHashChange);
-    if(q.get('presenter') === '1' || q.get('notes') === '1'){
-      document.body.classList.add('wse-presenter-mode');
-      document.getElementById('scriptPanel')?.classList.add('open');
-    }
-  }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
-})();
-</script>
-
 </body>
 </html>
