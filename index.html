@@ -3,6 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script id="sagulife-v12-customer-early-flag">
+(function(){
+  try{
+    var p=new URLSearchParams(location.search);
+    if(p.get('view')==='customer'||p.get('customer')==='1'||p.get('display')==='customer'||p.get('preview')==='1'){
+      document.documentElement.classList.add('sagu-customer-view');
+    }
+  }catch(e){}
+})();
+</script>
+
     <meta name="slides-format" content="viewport">
     <title>SAGULIFE 商談プレゼン v8 WSE操作版｜台本連動プレゼン</title>
 
@@ -1607,6 +1618,78 @@
   }
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+
+
+<style id="sagulife-v12-customer-clean-css">
+  /* v12 hard customer-clean mode: customer must never see speaker cue/cue-copy text on question slides. */
+  html.sagu-customer-view .slide-light-q .content > p,
+  html.sagu-customer-view .slide-light-q .content > p.reveal,
+  body.v11-customer .slide-light-q .content > p,
+  body.v11-customer .slide-light-q .content > p.reveal,
+  body.v11-customer .presenter-only,
+  body.v11-customer .speaker-only,
+  body.v11-customer .cue-only,
+  body.v11-customer [data-presenter-only="true"]{
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+    height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+  }
+
+  /* keep customer question slides visually centered after removing cue text */
+  html.sagu-customer-view .slide-light-q .content,
+  body.v11-customer .slide-light-q .content{
+    min-height:100vh;
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:center !important;
+  }
+
+  html.sagu-customer-view .slide-light-q .accent-divider,
+  body.v11-customer .slide-light-q .accent-divider{
+    margin-bottom:0 !important;
+  }
+</style>
+<script id="sagulife-v12-customer-clean-js">
+(function(){
+  function isCustomerMode(){
+    try{
+      var p=new URLSearchParams(location.search);
+      return p.get('view')==='customer'||p.get('customer')==='1'||p.get('display')==='customer'||p.get('preview')==='1'||document.body.classList.contains('v11-customer');
+    }catch(e){ return document.body.classList.contains('v11-customer'); }
+  }
+  function hardCleanCustomer(){
+    if(!isCustomerMode()) return;
+    document.documentElement.classList.add('sagu-customer-view');
+    document.body.classList.add('v12-customer-clean');
+    // These paragraphs were speaker prompts/cue copy. Remove from customer DOM so they cannot appear in shared view.
+    document.querySelectorAll('.slide-light-q .content > p, .slide-light-q .content > p.reveal').forEach(function(el){
+      el.setAttribute('data-v12-removed-from-customer','true');
+      el.remove();
+    });
+    document.querySelectorAll('.presenter-tools,.script-panel,.wse-bottom-hint,.help-pop,.overview,.toast,.nav-controls,.mini-progress').forEach(function(el){
+      el.style.setProperty('display','none','important');
+      el.style.setProperty('visibility','hidden','important');
+      el.style.setProperty('opacity','0','important');
+      el.style.setProperty('pointer-events','none','important');
+    });
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      hardCleanCustomer();
+      setTimeout(hardCleanCustomer,50);
+      setTimeout(hardCleanCustomer,500);
+    });
+  }else{
+    hardCleanCustomer();
+    setTimeout(hardCleanCustomer,50);
+    setTimeout(hardCleanCustomer,500);
+  }
 })();
 </script>
 
