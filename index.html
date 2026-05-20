@@ -5,44 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>SAGULIFE 商談プレゼン</title>
 <style>
-:root{
-  --bg:#05070c;
-  --panel:#081426;
-  --ink:#f7fbff;
-  --muted:#9baec7;
-  --line:rgba(255,255,255,.12);
-  --orange:#ff7a1a;
-  --orange2:#ffb36a;
-  --green:#39dd94;
-  --red:#ff626a;
-  --blue:#37cfff;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body,#app{width:100%;height:100%;overflow:hidden}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
-  background:radial-gradient(circle at 80% 10%,rgba(255,122,26,.16),transparent 28%),linear-gradient(135deg,#03050a,#081426 55%,#020407);
-  color:var(--ink);
-}
-button{font:inherit}
-.stage{position:relative;width:100%;height:100%;background:#020407;overflow:hidden}
-.stage:before{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse at center,transparent 58%,rgba(0,0,0,.55))}
-.stage:after{content:"";position:absolute;inset:34px;z-index:5;pointer-events:none;border:1px solid rgba(255,255,255,.08)}
-.progressTrack{position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,.08);z-index:10}
-.progress{height:100%;width:7.692%;background:linear-gradient(90deg,var(--orange),#f3c65f);box-shadow:0 0 22px rgba(255,122,26,.75);transition:.25s}
-.media{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#020407}
-.media.active{display:flex}
-.media img,.media video{width:100%;height:100%;object-fit:contain;background:#020407;display:none}
-.media.active.use-image img{display:block}
-.media.active.use-video video{display:block}
-.fallback{position:absolute;inset:0;display:none;padding:7vh 6vw;background:radial-gradient(circle at 80% 12%,rgba(255,122,26,.14),transparent 26%),linear-gradient(135deg,#05070c,#081426 62%,#020407)}
-.media.active.use-fallback .fallback{display:flex}
-.fallbackInner{width:100%;height:100%;border:1px solid rgba(255,122,26,.28);padding:7vh 5vw;display:flex;flex-direction:column;justify-content:center;background:linear-gradient(135deg,rgba(255,255,255,.035),rgba(255,255,255,.01));box-shadow:0 30px 90px rgba(0,0,0,.35)}
-.fallbackKicker{font-size:clamp(14px,1.3vw,22px);color:var(--orange2);font-weight:900;letter-spacing:.16em;margin-bottom:3vh}
-.fallbackTitle{font-size:clamp(38px,5vw,88px);font-weight:950;line-height:1.18;letter-spacing:.01em;text-wrap:balance}
-.fallbackSub{margin-top:3vh;font-size:clamp(18px,1.8vw,30px);line-height:1.7;color:rgba(255,255,255,.78);max-width:74vw}
-.fallbackTags{display:flex;gap:14px;flex-wrap:wrap;margin-top:5vh}
-.fallbackTag{border:1px solid rgba(255,122,26,.42);color:#fff;padding:12px 20px;border-radius:999px;background:rgba(255,122,26,.10);font-weight:900;font-size:clamp(14px,1.3vw,20px)}
+:root{--bg:#05070c;--panel:#081426;--ink:#f7fbff;--muted:#9baec7;--line:rgba(255,255,255,.12);--orange:#ff7a1a;--orange2:#ffb36a;--green:#39dd94;--red:#ff626a;--blue:#37cfff}
+*{box-sizing:border-box;margin:0;padding:0}html,body,#app{width:100%;height:100%;overflow:hidden}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:radial-gradient(circle at 80% 10%,rgba(255,122,26,.16),transparent 28%),linear-gradient(135deg,#03050a,#081426 55%,#020407);color:var(--ink)}button{font:inherit}
+.stage{position:relative;width:100%;height:100%;background:#020407;overflow:hidden}.stage:before{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse at center,transparent 58%,rgba(0,0,0,.55))}.stage:after{content:"";position:absolute;inset:34px;z-index:5;pointer-events:none;border:1px solid rgba(255,255,255,.08)}
+.progressTrack{position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,.08);z-index:10}.progress{height:100%;width:7.692%;background:linear-gradient(90deg,var(--orange),#f3c65f);box-shadow:0 0 22px rgba(255,122,26,.75);transition:.25s}
+.media{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#020407}.media.active{display:flex}.media img,.media video{width:100%;height:100%;object-fit:contain;background:#020407;display:none}.media.active.use-image img{display:block}.media.active.use-video video{display:block}
+.fallback{position:absolute;inset:0;display:none;padding:7vh 6vw;background:radial-gradient(circle at 80% 12%,rgba(255,122,26,.14),transparent 26%),linear-gradient(135deg,#05070c,#081426 62%,#020407)}.media.active.use-fallback .fallback{display:flex}.fallbackInner{width:100%;height:100%;border:1px solid rgba(255,122,26,.28);padding:7vh 5vw;display:flex;flex-direction:column;justify-content:center;background:linear-gradient(135deg,rgba(255,255,255,.035),rgba(255,255,255,.01));box-shadow:0 30px 90px rgba(0,0,0,.35)}.fallbackKicker{font-size:clamp(14px,1.3vw,22px);color:var(--orange2);font-weight:900;letter-spacing:.16em;margin-bottom:3vh}.fallbackTitle{font-size:clamp(38px,5vw,88px);font-weight:950;line-height:1.18;letter-spacing:.01em;text-wrap:balance}.fallbackSub{margin-top:3vh;font-size:clamp(18px,1.8vw,30px);line-height:1.7;color:rgba(255,255,255,.78);max-width:74vw}.fallbackTags{display:flex;gap:14px;flex-wrap:wrap;margin-top:5vh}.fallbackTag{border:1px solid rgba(255,122,26,.42);color:#fff;padding:12px 20px;border-radius:999px;background:rgba(255,122,26,.10);font-weight:900;font-size:clamp(14px,1.3vw,20px)}
 .shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.18),transparent 16%,transparent 84%,rgba(0,0,0,.18))}
 .hud{position:absolute;left:58px;top:48px;z-index:7;display:flex;align-items:center;gap:12px;color:rgba(255,255,255,.58);font-size:12px;letter-spacing:.1em;font-weight:900;text-shadow:0 1px 8px #000}.logo{height:38px;min-width:132px;display:grid;place-items:center;color:#fff;letter-spacing:.22em;border:1px solid rgba(255,122,26,.5);background:linear-gradient(135deg,rgba(255,122,26,.25),rgba(255,122,26,.06));box-shadow:0 0 26px rgba(255,122,26,.22)}
 .counter{position:absolute;right:58px;bottom:48px;z-index:7;color:rgba(255,255,255,.58);font-size:13px;letter-spacing:.14em;font-weight:900}.vflag{position:absolute;right:58px;top:52px;z-index:7;color:var(--orange2);font-size:12px;font-weight:900;letter-spacing:.14em;display:none}.vflag.on{display:block}
@@ -62,265 +30,174 @@ button{font:inherit}
 <script>
 const slides=[
   {
-    base:"slide00",
-    title:"表紙",
-    fallbackTitle:"SAGULIFE",
-    fallbackSub:"ノベルティ・グッズ制作会社様向け 補完ライン提案",
-    tags:["商談資料","裏側の制作ライン","受け皿確認"],
-    first:"本日は、SAGULIFEの一方的な紹介ではなく、御社が過去に対応を見送った案件の中に、補完できる余地があるかを確認できればと思います。",
-    talk:"最初に強く売り込まず、商談の前提を“過去案件の棚卸し”に置きます。相手が警戒しないよう、置き換えではなく補完の話として入ります。",
-    point:"表紙は短く。ここでは売り込まない。次の過去案件の想起へつなぐ。",
-    ask:"本日は、過去に受けたかったけれど受けにくかった案件があるか、そこから確認させてください。"
+    "base": "page01",
+    "title": "表紙",
+    "headline": "SAGULIFE",
+    "sub": "ノベルティ・グッズ制作会社様向け 補完ライン提案",
+    "first": "本日は、SAGULIFEの一方的な紹介ではなく、御社が過去に対応を見送った案件の中に、補完できる余地があるかを確認できればと思います。",
+    "talk": "最初から売り込まず、商談の前提を「過去案件の棚卸し」に置きます。置き換えではなく、御社の既存体制を活かした補完の話として入ります。",
+    "point": "表紙は短く。SAGULIFEの名前だけを印象づけ、すぐに過去案件の想起へ入る。",
+    "ask": "本日は、過去に受けたかったけれど受けにくかった案件があるか、そこから確認させてください。"
   },
   {
-    base:"slide01",
-    title:"01 過去に断った案件、まだ売上に変えられるかもしれません",
-    fallbackTitle:"過去に断った案件、まだ売上に変えられるかもしれません",
-    fallbackSub:"新しい売り込みではなく、過去案件の振り返りから始める。",
-    tags:["過去案件","未対応相談","売上化余地"],
-    first:"ここからは、御社が過去に対応を見送った問い合わせの中に、次回は売上化できる案件が残っていないかを見ていきたいです。",
-    talk:"新規開拓の話ではなく、すでに来ていた相談の再確認にします。相手に“そういえば断った案件があった”と思い出してもらうのが狙いです。",
-    point:"相手の記憶を刺激する。説明を増やさず問いを置く。",
-    ask:"過去半年から1年で、条件が合わず対応を見送った問い合わせはありましたか？"
+    "base": "page04",
+    "title": "01 過去に断った案件、まだ売上に変えられるかもしれません",
+    "headline": "過去に断った案件、まだ売上に変えられるかもしれません",
+    "sub": "新しい売り込みではなく、過去案件の振り返りから始める",
+    "first": "ここからは、御社が過去に対応を見送った問い合わせの中に、次回は売上化できる案件が残っていないかを見ていきたいです。",
+    "talk": "新規開拓の話ではなく、すでに来ていた相談の再確認にします。相手に「そういえば断った案件があった」と思い出してもらうのが狙いです。",
+    "point": "相手の記憶を刺激する。説明を増やさず問いを置く。",
+    "ask": "過去半年から1年で、条件が合わず対応を見送った問い合わせはありましたか？"
   },
   {
-    base:"slide02a",
-    title:"02 売上拡大は、新規開拓だけではありません",
-    fallbackTitle:"売上拡大は、新規開拓だけではありません",
-    fallbackSub:"すでに来ていた相談の中に、次の受注候補が眠っているかもしれません。",
-    tags:["既存問い合わせ","未対応案件","次回受注候補"],
-    first:"売上を伸ばす方法は、新しい問い合わせを増やすことだけではありません。すでに来ていたけれど、当時は対応できなかった相談の中にも余地があります。",
-    talk:"営業量を増やす話にすると重くなるので、“過去の未対応案件の再検討”にする。相手の負担を増やさず売上余地を探す姿勢を出します。",
-    point:"新規開拓ではなく、既存問い合わせの棚卸しとして見せる。",
-    ask:"御社では、問い合わせは来たものの、当時の条件で見送った案件はどのくらいありますか？"
+    "base": "page05",
+    "title": "02 売上拡大は、新規開拓だけではありません",
+    "headline": "売上拡大は、新規開拓だけではありません",
+    "sub": "すでに来ていた相談の中に、次の受注候補が眠っているかもしれません",
+    "first": "売上を伸ばす方法は、新しい問い合わせを増やすことだけではありません。すでに来ていたけれど、当時は対応できなかった相談の中にも余地があります。",
+    "talk": "営業量を増やす話にすると重くなるので、過去の未対応案件の再検討にします。相手の負担を増やさず売上余地を探す姿勢を出します。",
+    "point": "新規開拓ではなく、既存問い合わせの棚卸しとして見せる。",
+    "ask": "御社では、問い合わせは来たものの、当時の条件で見送った案件はどのくらいありますか？"
   },
   {
-    base:"slide03",
-    title:"03 断った理由から、強化したい部分が見えてくる",
-    fallbackTitle:"断った理由から、強化したい部分が見えてくる",
-    fallbackSub:"過去の見送り理由を整理すると、次に強化すべき領域が見えてきます。",
-    tags:["ロット","納期","加工","商材","キャパ"],
-    first:"断った理由を振り返ると、御社が今後強化したい部分が見えてきます。ロット、納期、加工、商材、キャパのどこに集中していたかを確認したいです。",
-    talk:"“断った理由は需要がなかったからか”だと詰問に聞こえるため、“強化したい部分はどこか”に変えます。相手が前向きに話しやすくなります。",
-    point:"責める言い方を避け、強化領域の確認に変える。",
-    ask:"過去に見送った理由で多かったのは、ロット・納期・加工・商材・キャパのどれに近いですか？"
+    "base": "page06",
+    "title": "03 断った理由から、強化したい部分が見えてくる",
+    "headline": "断った理由から、強化したい部分が見えてくる",
+    "sub": "過去の見送り理由を整理すると、次に強化すべき領域が見えてきます",
+    "first": "断った理由を振り返ると、御社が今後強化したい部分が見えてきます。ロット、納期、加工、商材、キャパのどこに集中していたかを確認したいです。",
+    "talk": "「断った理由は需要がなかったからか」だと詰問に聞こえるため、「強化したい部分はどこか」に変えます。相手が前向きに話しやすくなります。",
+    "point": "責める言い方を避け、強化領域の確認に変える。",
+    "ask": "過去に見送った理由で多かったのは、ロット・納期・加工・商材・キャパのどれに近いですか？"
   },
   {
-    base:"slide05",
-    title:"04 見送りやすい案件には、共通点があります",
-    fallbackTitle:"見送りやすい案件には、共通点があります",
-    fallbackSub:"小ロット・短納期・変則仕様。判断が難しい案件ほど、次の提案機会になりやすい。",
-    tags:["小ロット","短納期","変則仕様"],
-    first:"見送りやすい案件には共通点があります。小ロット、短納期、変則仕様のように、受注判断が難しくなりやすい案件です。",
-    talk:"ここは細かい説明ではなく、相手の“あるある”を引き出す。あえて3つに絞り、商談相手が思い出しやすい余白を残します。",
-    point:"情報を詰め込まない。小ロット・短納期・変則仕様だけでよい。",
-    ask:"この3つの中で、御社が一番判断に迷いやすいのはどれですか？"
+    "base": "page08",
+    "title": "04 見送りやすい案件には、共通点があります",
+    "headline": "見送りやすい案件には、共通点があります",
+    "sub": "小ロット・短納期・変則仕様。判断が難しい案件ほど、次の提案機会になりやすい",
+    "first": "見送りやすい案件には共通点があります。小ロット、短納期、変則仕様のように、受注判断が難しくなりやすい案件です。",
+    "talk": "ここは細かい説明ではなく、相手の「あるある」を引き出します。あえて3つに絞り、商談相手が思い出しやすい余白を残します。",
+    "point": "情報を詰め込まない。小ロット・短納期・変則仕様だけでよい。",
+    "ask": "この3つの中で、御社が一番判断に迷いやすいのはどれですか？"
   },
   {
-    base:"slide06",
-    title:"05 小ロットは面倒。でも、次の取引の入口にもなる",
-    fallbackTitle:"小ロットは面倒。でも、次の取引の入口にもなる",
-    fallbackSub:"初回接点・テスト発注・限定案件から継続取引へ。",
-    tags:["初回接点","テスト発注","限定案件","継続取引"],
-    first:"小ロットは面倒な案件に見えやすい一方で、初回取引や継続発注の入口になることもあります。",
-    talk:"小ロットを美化しすぎず、“面倒”を認めたうえで可能性に変える。相手が本音で話しやすくなります。",
-    point:"小ロットの負荷と可能性を両面で扱う。",
-    ask:"御社では、小ロットから継続案件に育ったケースはありますか？"
+    "base": "page09",
+    "title": "05 小ロットは面倒。でも、次の取引の入口にもなる",
+    "headline": "小ロットは面倒。でも、次の取引の入口にもなる",
+    "sub": "初回接点・テスト発注・限定案件から継続取引へ",
+    "first": "小ロットは面倒な案件に見えやすい一方で、初回取引や継続発注の入口になることもあります。",
+    "talk": "小ロットを美化しすぎず、「面倒」を認めたうえで可能性に変えます。相手が本音で話しやすくなります。",
+    "point": "小ロットの負荷と可能性を両面で扱う。",
+    "ask": "御社では、小ロットから継続案件に育ったケースはありますか？"
   },
   {
-    base:"slide07",
-    title:"06 技術的に難しかった案件も、補完先があれば提案範囲になる",
-    fallbackTitle:"技術的に難しかった案件も、補完先があれば提案範囲になる",
-    fallbackSub:"アパレル・雑貨・特殊加工・POPUP向けまで、補完先があることで提案可能領域が広がる。",
-    tags:["アパレル","雑貨","特殊加工","POPUP向け"],
-    first:"自社単独では難しかった案件も、外部の補完先があれば次回から提案範囲に変えられる可能性があります。",
-    talk:"技術的に“できなかった”と指摘しない。あくまで補完先があれば提案範囲が広がる、という前向きな表現にします。",
-    point:"技術不足ではなく、提案範囲拡大の話にする。",
-    ask:"御社で、対応できれば提案の幅が広がると感じる商材や加工はありますか？"
+    "base": "page10",
+    "title": "06 技術的に難しかった案件も、補完先があれば提案範囲になる",
+    "headline": "技術的に難しかった案件も、補完先があれば提案範囲になる",
+    "sub": "アパレル・雑貨・特殊加工・POPUP向けまで、補完先があることで提案可能領域が広がる",
+    "first": "自社単独では難しかった案件も、外部の補完先があれば次回から提案範囲に変えられる可能性があります。",
+    "talk": "技術的に「できなかった」と指摘しない。あくまで補完先があれば提案範囲が広がる、という前向きな表現にします。",
+    "point": "技術不足ではなく、提案範囲拡大の話にする。",
+    "ask": "御社で、対応できれば提案の幅が広がると感じる商材や加工はありますか？"
   },
   {
-    base:"slide08",
-    title:"07 キャパ不足で断った案件は、次回の受注候補に変えられる",
-    fallbackTitle:"キャパ不足で断った案件は、次回の受注候補に変えられる",
-    fallbackSub:"繁忙期・人員不足・製造枠不足で見送った案件を、次の受注候補として見直す。",
-    tags:["繁忙期","人員不足","製造枠不足","次回受注候補"],
-    first:"キャパ不足で断った案件は、需要がなかったのではなく、当時受けられる体制がなかっただけかもしれません。次回の受注候補として見直せます。",
-    talk:"繁忙期や人員不足は相手が認めやすいテーマ。ここで外部補完の必要性を自然に想起させます。",
-    point:"“断った案件”を“次回候補”に言い換える。",
-    ask:"繁忙期や製造枠不足で、本当は受けたかった相談を見送ることはありますか？"
+    "base": "page11",
+    "title": "07 キャパ不足で断った案件は、次回の受注候補に変えられる",
+    "headline": "キャパ不足で断った案件は、次回の受注候補に変えられる",
+    "sub": "繁忙期・人員不足・製造枠不足で見送った案件を、次の受注候補として見直す",
+    "first": "キャパ不足で断った案件は、需要がなかったのではなく、当時受けられる体制がなかっただけかもしれません。次回の受注候補として見直せます。",
+    "talk": "繁忙期や人員不足は相手が認めやすいテーマ。ここで外部補完の必要性を自然に想起させます。",
+    "point": "「断った案件」を「次回候補」に言い換える。",
+    "ask": "繁忙期や製造枠不足で、本当は受けたかった相談を見送ることはありますか？"
   },
   {
-    base:"slide02",
-    title:"08 SAGULIFEの対応範囲",
-    fallbackTitle:"SAGULIFEの対応範囲",
-    fallbackSub:"アパレル・雑貨・特殊加工・小ロット・POPUP/物販まで。特に、他社にできない特殊加工も相談可能です。",
-    tags:["Tシャツ","スウェット","トートバッグ","ステッカー","アクリルスタンド","ラバーキーホルダー","特殊加工","POPUP/物販"],
-    first:"ここまでの見送り理由を踏まえて、SAGULIFE側で補完できる可能性のある範囲を共有します。アパレル、雑貨、小ロット、POPUPや物販向け、そして他社で難しい特殊加工も相談可能です。",
-    talk:"冒頭ではなく、相手が課題を思い出した後に出します。ここで初めて“その領域なら相談できる”という受け皿として見せます。",
-    point:"対応範囲はソリューションとして後半に出す。",
-    ask:"この中で、御社の見送り理由に近い領域はありますか？"
+    "base": "page02",
+    "title": "08 SAGULIFEの対応範囲",
+    "headline": "SAGULIFEの対応範囲",
+    "sub": "アパレル・雑貨・特殊加工・小ロット・POPUP/物販まで",
+    "first": "ここまでの見送り理由を踏まえて、SAGULIFE側で補完できる可能性のある範囲を共有します。アパレル、雑貨、小ロット、POPUPや物販向け、そして他社で難しい特殊加工も相談可能です。",
+    "talk": "冒頭ではなく、相手が課題を思い出した後に出します。ここで初めて「その領域なら相談できる」という受け皿として見せます。",
+    "point": "対応範囲はソリューションとして後半に出す。",
+    "ask": "この中で、御社の見送り理由に近い領域はありますか？"
   },
   {
-    base:"slideSpecial",
-    title:"09 特殊加工",
-    fallbackTitle:"他社にできない特殊加工が、提案の幅を広げます",
-    fallbackSub:"一般的な名入れでは対応しにくい仕様も、SAGULIFEなら相談可能です。例：ジップまたぎプリント対応。",
-    tags:["特殊加工","ジップまたぎプリント","差別化","小ロット相談OK"],
-    first:"特に、提案の幅を広げやすいのが特殊加工です。通常仕様では弱い案件に、もう一段提案できる受け皿として使える可能性があります。",
-    talk:"“何でもできます”ではなく、通常の名入れや定番ノベルティでは表現しづらい案件に対して、特殊加工という追加提案の余地があることを示します。",
-    point:"ここで“他社にできない特殊加工”の事実を入れる。加工NG案件を思い出させる。",
-    ask:"過去に、加工仕様が理由で受けにくかった相談はありましたか？"
+    "base": "page03",
+    "title": "09 特殊加工",
+    "headline": "他社にできない特殊加工が、提案の幅を広げます",
+    "sub": "例：ジップまたぎプリント。通常の名入れでは対応しにくい仕様も相談可能",
+    "first": "特に、提案の幅を広げやすいのが特殊加工です。通常仕様では弱い案件に、もう一段提案できる受け皿として使える可能性があります。",
+    "talk": "「何でもできます」ではなく、通常の名入れや定番ノベルティでは表現しづらい案件に対して、特殊加工という追加提案の余地があることを示します。",
+    "point": "ここで「他社にできない特殊加工」の事実を入れる。加工NG案件を思い出させる。",
+    "ask": "過去に、加工仕様が理由で受けにくかった相談はありましたか？"
   },
   {
-    base:"slide04",
-    title:"10 SAGULIFEの対応力で、受け皿を広げられるかもしれません",
-    fallbackTitle:"SAGULIFEの対応力で、受け皿を広げられるかもしれません",
-    fallbackSub:"小ロット・特殊加工・アパレル/雑貨・POPUP/物販対応を、補完ラインとして活用できる可能性があります。",
-    tags:["補完ライン","受け皿拡大","対応力"],
-    first:"もし見送り理由が、御社の需要不足ではなく受け皿の制約だった場合、SAGULIFEの対応力で受け皿を広げられるかもしれません。",
-    talk:"最後にSAGULIFEを解決策として置きます。ただし“任せてください”ではなく、“活用できる可能性がある”と控えめにします。",
-    point:"SAGULIFEを補完ラインとして位置づける。置き換えではなく、受け皿拡大。",
-    ask:"御社の既存ラインを活かしたまま、補完ラインがあると受けやすくなる案件はありますか？"
+    "base": "page07",
+    "title": "10 SAGULIFEの対応力で、受け皿を広げられるかもしれません",
+    "headline": "SAGULIFEの対応力で、受け皿を広げられるかもしれません",
+    "sub": "小ロット・特殊加工・アパレル/雑貨・POPUP/物販対応を、補完ラインとして活用できる可能性があります",
+    "first": "もし見送り理由が、御社の需要不足ではなく受け皿の制約だった場合、SAGULIFEの対応力で受け皿を広げられるかもしれません。",
+    "talk": "最後にSAGULIFEを解決策として置きます。ただし「任せてください」ではなく、「活用できる可能性がある」と控えめにします。",
+    "point": "SAGULIFEを補完ラインとして位置づける。置き換えではなく、受け皿拡大。",
+    "ask": "御社の既存ラインを活かしたまま、補完ラインがあると受けやすくなる案件はありますか？"
   }
-].map(s=>({ ...s, image:`assets/${s.base}.png`, video:`assets/${s.base}.mp4`, hasVideo:false, checked:false, imageOk:false }));
-
+].map(s=>({...s,image:`assets/${s.base}.png`,video:`assets/${s.base}.mp4`,hasVideo:false,checked:false,imageOk:false,imageFailed:false}));
 const params=new URLSearchParams(location.search),isAud=params.get("view")==="audience";
 let cur=parseInt(location.hash.replace("#s",""),10);if(isNaN(cur)||cur<0||cur>=slides.length)cur=0;
-let aud=null,start=Date.now();const ch=("BroadcastChannel"in window)?new BroadcastChannel("sagulife-sync-v2"):null;
-
+let aud=null,start=Date.now();const ch=("BroadcastChannel"in window)?new BroadcastChannel("sagulife-sync-v6"):null;
 function tagsHtml(s){return (s.tags||[]).map(t=>`<span class="fallbackTag">${t}</span>`).join("")}
-function media(s,i){let a=i===cur?" active":"";return`<div class="media use-image${a}" data-i="${i}"><img data-img="${i}" src="${s.image}?v=20260520" alt="${s.title}" loading="eager" decoding="async"><video data-v="${i}" src="${s.video}?v=20260520" poster="${s.image}?v=20260520" muted playsinline preload="metadata" loop></video><div class="fallback"><div class="fallbackInner"><div class="fallbackKicker">SAGULIFE PRESENTATION</div><div class="fallbackTitle">${s.fallbackTitle}</div><div class="fallbackSub">${s.fallbackSub}</div><div class="fallbackTags">${tagsHtml(s)}</div></div></div><div class="shade"></div></div>`}
-function stage(){return`<div class="stage"><div class="progressTrack"><div class="progress"></div></div>${slides.map(media).join("")}<div class="hud"><div class="logo">SAGULIFE</div><div>CLIENT PRESENTATION<br>WITH PRESENTER NOTES</div></div><div class="vflag">VIDEO / AUTO DETECTED</div><div class="counter">01 / ${String(slides.length).padStart(2,"0")}</div><div class="vctrl"><button onclick="restartVideo()">動画を最初から</button><button onclick="toggleVideo()">停止/再生</button></div></div>`}
-
+function media(s,i){let a=i===cur?" active":"";return`<div class="media use-image${a}" data-i="${i}"><img data-img="${i}" src="${s.image}" alt="${s.title}" loading="eager" decoding="async" fetchpriority="high"><video data-v="${i}" src="${s.video}" poster="${s.image}" muted playsinline preload="metadata" loop></video><div class="fallback"><div class="fallbackInner"><div class="fallbackKicker">SAGULIFE PRESENTATION</div><div class="fallbackTitle">${s.headline}</div><div class="fallbackSub">${s.sub}</div><div class="fallbackTags">${tagsHtml(s)}</div></div></div><div class="shade"></div></div>`}
+function stage(){return`<div class="stage"><div class="progressTrack"><div class="progress"></div></div>${slides.map(media).join("")}<div class="vflag">VIDEO / AUTO DETECTED</div><div class="counter">01 / ${String(slides.length).padStart(2,"0")}</div><div class="vctrl"><button onclick="restartVideo()">動画を最初から</button><button onclick="toggleVideo()">停止/再生</button></div></div>`}
 function initMediaDetection(){
   document.querySelectorAll("img[data-img]").forEach(img=>{
-    const i=parseInt(img.dataset.img,10), s=slides[i];
-    const markLoaded=()=>{s.imageOk=true;updateMediaClasses();updateCueMediaLabels();};
-    const markError=()=>{s.imageOk=false;s.checked=true;updateMediaClasses();updateCueMediaLabels();};
-    img.addEventListener("load",markLoaded,{once:true});
-    img.addEventListener("error",markError,{once:true});
-    // 重要：ブラウザキャッシュやVercel配信で、listener登録前に画像が読み込み済みになることがある。
-    // その場合 load イベントが発火しないため、complete/naturalWidth で即時判定する。
+    const i=parseInt(img.dataset.img,10),s=slides[i];
+    const ok=()=>{s.imageOk=true;s.imageFailed=false;updateMediaClasses();updateCueMediaLabels();};
+    const ng=()=>{s.imageOk=false;s.imageFailed=true;updateMediaClasses();updateCueMediaLabels();};
+    img.addEventListener("load",ok,{once:true});
+    img.addEventListener("error",ng,{once:true});
+    // 画像がキャッシュ済みの場合、loadイベントが拾えないことがあるため即時判定
     if(img.complete){
-      if(img.naturalWidth>0) markLoaded();
-      else markError();
+      if(img.naturalWidth>0) ok();
+      else if(img.naturalWidth===0) ng();
     }
   });
   document.querySelectorAll("video[data-v]").forEach(v=>{
-    const i=parseInt(v.dataset.v,10), s=slides[i];
-    const markVideo=()=>{s.hasVideo=true;s.checked=true;updateMediaClasses();if(i===cur)playCurrentVideo();updateCueMediaLabels();};
-    const markNoVideo=()=>{s.hasVideo=false;s.checked=true;updateMediaClasses();updateCueMediaLabels();};
-    v.addEventListener("loadedmetadata",markVideo,{once:true});
-    v.addEventListener("error",markNoVideo,{once:true});
-    // 既にmetadataが読まれている場合の即時判定
-    if(v.readyState>=1) markVideo();
+    const i=parseInt(v.dataset.v,10),s=slides[i];
+    const ok=()=>{s.hasVideo=true;s.checked=true;updateMediaClasses();if(i===cur)playCurrentVideo();updateCueMediaLabels();};
+    const ng=()=>{s.hasVideo=false;s.checked=true;updateMediaClasses();updateCueMediaLabels();};
+    v.addEventListener("loadedmetadata",ok,{once:true});
+    v.addEventListener("error",ng,{once:true});
+    if(v.readyState>=1) ok();
     try{v.load()}catch(e){}
   });
 }
 function updateMediaClasses(){
   document.querySelectorAll(".media").forEach((m,i)=>{
-    const active=i===cur, useVideo=active&&slides[i].hasVideo, useImage=active&&!useVideo&&slides[i].imageOk, useFallback=active&&!useVideo&&!slides[i].imageOk;
-    m.classList.toggle("active",active);m.classList.toggle("use-video",useVideo);m.classList.toggle("use-image",useImage);m.classList.toggle("use-fallback",useFallback);
+    const active=i===cur;
+    const useVideo=active&&slides[i].hasVideo;
+    // 初期状態ではfallbackに落とさず、まず画像を表示させに行く。
+    // 画像エラーが確定した時だけfallbackを出す。
+    const useFallback=active&&!useVideo&&slides[i].imageFailed;
+    const useImage=active&&!useVideo&&!useFallback;
+    m.classList.toggle("active",active);
+    m.classList.toggle("use-video",useVideo);
+    m.classList.toggle("use-image",useImage);
+    m.classList.toggle("use-fallback",useFallback);
   });
   document.querySelectorAll(".vflag").forEach(f=>f.classList.toggle("on",slides[cur]&&slides[cur].hasVideo));
 }
-function setSlide(n,src="local"){
-  if(n<0||n>=slides.length)return;cur=n;updateMediaClasses();
-  document.querySelectorAll(".progress").forEach(p=>p.style.width=((cur+1)/slides.length*100)+"%");
-  document.querySelectorAll(".counter").forEach(c=>c.textContent=String(cur+1).padStart(2,"0")+" / "+String(slides.length).padStart(2,"0"));
-  document.querySelectorAll(".cue").forEach((c,i)=>c.classList.toggle("active",i===cur));
-  resetVideos();let ac=document.querySelector(".cue.active");if(ac&&src==="local")ac.scrollIntoView({block:"center",behavior:"smooth"});
-  history.replaceState(null,"","#s"+cur);if(!isAud&&src!=="remote")sync();
-}
+function setSlide(n,src="local"){if(n<0||n>=slides.length)return;cur=n;updateMediaClasses();document.querySelectorAll(".progress").forEach(p=>p.style.width=((cur+1)/slides.length*100)+"%");document.querySelectorAll(".counter").forEach(c=>c.textContent=String(cur+1).padStart(2,"0")+" / "+String(slides.length).padStart(2,"0"));document.querySelectorAll(".cue").forEach((c,i)=>c.classList.toggle("active",i===cur));resetVideos();let ac=document.querySelector(".cue.active");if(ac&&src==="local")ac.scrollIntoView({block:"center",behavior:"smooth"});history.replaceState(null,"","#s"+cur);if(!isAud&&src!=="remote")sync();}
 function resetVideos(){document.querySelectorAll("video").forEach(v=>{let i=parseInt(v.dataset.v,10);try{if(i===cur&&slides[i].hasVideo){v.pause();v.currentTime=0;let p=v.play();if(p&&p.catch)p.catch(()=>{})}else{v.pause();v.currentTime=0}}catch(e){}})}
 function playCurrentVideo(){document.querySelectorAll(`video[data-v="${cur}"]`).forEach(v=>{try{let p=v.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}})}
 function restartVideo(){document.querySelectorAll(`video[data-v="${cur}"]`).forEach(v=>{try{v.pause();v.currentTime=0;v.play()}catch(e){}})}
 function toggleVideo(){document.querySelectorAll(`video[data-v="${cur}"]`).forEach(v=>{v.paused?v.play():v.pause()})}
-function sync(){let m={type:"sagulife-slide",slide:cur,at:Date.now()};if(aud&&!aud.closed)aud.postMessage(m,"*");if(ch)ch.postMessage(m);try{localStorage.setItem("sagulife-sync-v2",JSON.stringify(m))}catch(e){}}
+function sync(){let m={type:"sagulife-slide",slide:cur,at:Date.now()};if(aud&&!aud.closed)aud.postMessage(m,"*");if(ch)ch.postMessage(m);try{localStorage.setItem("sagulife-sync-v6",JSON.stringify(m))}catch(e){}}
 function openAud(){let u=new URL(location.href);u.searchParams.set("view","audience");u.hash="s"+cur;aud=window.open(u.toString(),"SAGULIFE_AUDIENCE","popup=yes,width=1440,height=900");setTimeout(sync,300);let st=document.getElementById("audStatus");if(st)st.innerHTML=aud?"顧客表示：<b>別ウィンドウ起動済み。この別ウィンドウだけ共有。</b>":"顧客表示：<b>ポップアップがブロックされています。</b>"}
 function fs(){if(!document.fullscreenElement&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen();else if(document.exitFullscreen)document.exitFullscreen()}
 function mediaStatusText(i){if(slides[i].hasVideo)return"VIDEO DETECTED / MP4自動再生";if(slides[i].imageOk)return"IMAGE SLIDE / PNG表示";return"FALLBACK SLIDE / assets未検出"}
 function updateCueMediaLabels(){document.querySelectorAll(".mediaType").forEach((el,i)=>el.textContent=mediaStatusText(i))}
-function presenter(){document.getElementById("app").innerHTML=`<div class="presenter"><div class="previewPane"><div class="notice">発表者ビュー：この画面は共有しない</div><div class="previewShell">${stage()}</div></div><aside class="panel"><div class="head"><h1>SAGULIFE 台本操作型プレゼン</h1><p>GitHub→Vercel対応。assets/slideXX.png があれば表示。MP4があれば自動で動画再生。</p></div><div class="warn">⚠ この画面を共有すると台本が見えます。「顧客表示を開く」で開いた別ウィンドウだけ共有してください。</div><div class="controls"><button class="primary" id="open">顧客表示を開く</button><button id="full">全画面</button></div><div class="controls"><button id="prev">← 前へ</button><button id="next">次へ →</button></div><div class="controls"><button id="rv">動画を最初から</button><button id="copy">質問をコピー</button></div><div class="status"><div id="audStatus">顧客表示：<b>未起動</b></div><div>経過時間：<b class="timer" id="timer">00:00</b></div><div>操作：Space / → 次へ、← 前へ、1〜9 指定、R 動画再開</div><div>画像配置：<b>assets/slide00.png, slide01.png, slide02a.png, slide03.png, slide05.png, slide06.png, slide07.png, slide08.png, slide02.png, slideSpecial.png, slide04.png</b></div></div><div class="cues">${slides.map((s,i)=>`<article class="cue" data-i="${i}"><div class="cueTop"><div><div class="cueNo">${String(i+1).padStart(2,"0")} / ${s.base}</div><div class="cueTitle">${s.title}</div></div><span class="badge">${String(i+1).padStart(2,"0")}</span></div><div class="mediaType">${mediaStatusText(i)}</div><div class="sec"><div class="lab">一言目</div><div class="txt strong">${s.first}</div></div><div class="sec"><div class="lab">補足説明</div><div class="txt">${s.talk}</div></div><div class="sec"><div class="lab">押さえるポイント</div><div class="tiny">${s.point}</div></div><div class="sec"><div class="lab">相手に投げる質問</div><div class="txt ask">${s.ask}</div></div></article>`).join("")}</div></aside></div>`;
-  document.querySelectorAll(".cue").forEach(c=>c.onclick=()=>setSlide(parseInt(c.dataset.i,10)));
-  document.getElementById("open").onclick=openAud;document.getElementById("full").onclick=fs;document.getElementById("prev").onclick=()=>setSlide(cur-1);document.getElementById("next").onclick=()=>setSlide(cur+1);document.getElementById("rv").onclick=restartVideo;document.getElementById("copy").onclick=async()=>{try{await navigator.clipboard.writeText(slides[cur].ask)}catch(e){alert(slides[cur].ask)}};
-  setInterval(()=>{let sec=Math.floor((Date.now()-start)/1000),m=String(Math.floor(sec/60)).padStart(2,"0"),s=String(sec%60).padStart(2,"0"),t=document.getElementById("timer");if(t)t.textContent=`${m}:${s}`},500);
-  initMediaDetection();setSlide(cur,"remote");
-}
-function audience(){document.getElementById("app").innerHTML=stage();let o=document.createElement("div");o.className="audOverlay";o.innerHTML='<button onclick="fs()">全画面</button><button onclick="restartVideo()">動画再開</button>';document.body.appendChild(o);window.onmessage=e=>{if(e.data&&e.data.type==="sagulife-slide")setSlide(e.data.slide,"remote")};if(ch)ch.onmessage=e=>{if(e.data&&e.data.type==="sagulife-slide")setSlide(e.data.slide,"remote")};window.addEventListener("storage",e=>{if(e.key==="sagulife-sync-v2"&&e.newValue){try{let m=JSON.parse(e.newValue);if(m.type==="sagulife-slide")setSlide(m.slide,"remote")}catch(_){}}});initMediaDetection();setSlide(cur,"remote")}
+function presenter(){document.getElementById("app").innerHTML=`<div class="presenter"><div class="previewPane"><div class="notice">発表者ビュー：この画面は共有しない</div><div class="previewShell">${stage()}</div></div><aside class="panel"><div class="head"><h1>SAGULIFE 台本操作型プレゼン v6</h1><p>GitHub→Vercel対応。assets/pageXX.png があれば表示。MP4があれば自動で動画再生。</p></div><div class="warn">⚠ この画面を共有すると台本が見えます。「顧客表示を開く」で開いた別ウィンドウだけ共有してください。</div><div class="controls"><button class="primary" id="open">顧客表示を開く</button><button id="full">全画面</button></div><div class="controls"><button id="prev">← 前へ</button><button id="next">次へ →</button></div><div class="controls"><button id="rv">動画を最初から</button><button id="copy">質問をコピー</button></div><div class="status"><div id="audStatus">顧客表示：<b>未起動</b></div><div>経過時間：<b class="timer" id="timer">00:00</b></div><div>操作：Space / → 次へ、← 前へ、1〜9 指定、R 動画再開</div><div>画像配置：<b>固定マニフェスト方式：page01 → page04 → page05 → page06 → page08 → page09 → page10 → page11 → page02 → page03 → page07</b></div></div><div class="cues">${slides.map((s,i)=>`<article class="cue" data-i="${i}"><div class="cueTop"><div><div class="cueNo">${String(i+1).padStart(2,"0")} / ${s.base}</div><div class="cueTitle">${s.title}</div></div><span class="badge">${String(i+1).padStart(2,"0")}</span></div><div class="mediaType">${mediaStatusText(i)}</div><div class="sec"><div class="lab">一言目</div><div class="txt strong">${s.first}</div></div><div class="sec"><div class="lab">補足説明</div><div class="txt">${s.talk}</div></div><div class="sec"><div class="lab">押さえるポイント</div><div class="tiny">${s.point}</div></div><div class="sec"><div class="lab">相手に投げる質問</div><div class="txt ask">${s.ask}</div></div></article>`).join("")}</div></aside></div>`;document.querySelectorAll(".cue").forEach(c=>c.onclick=()=>setSlide(parseInt(c.dataset.i,10)));document.getElementById("open").onclick=openAud;document.getElementById("full").onclick=fs;document.getElementById("prev").onclick=()=>setSlide(cur-1);document.getElementById("next").onclick=()=>setSlide(cur+1);document.getElementById("rv").onclick=restartVideo;document.getElementById("copy").onclick=async()=>{try{await navigator.clipboard.writeText(slides[cur].ask)}catch(e){alert(slides[cur].ask)}};setInterval(()=>{let sec=Math.floor((Date.now()-start)/1000),m=String(Math.floor(sec/60)).padStart(2,"0"),s=String(sec%60).padStart(2,"0"),t=document.getElementById("timer");if(t)t.textContent=`${m}:${s}`},500);initMediaDetection();setSlide(cur,"remote");}
+function audience(){document.getElementById("app").innerHTML=stage();let o=document.createElement("div");o.className="audOverlay";o.innerHTML='<button onclick="fs()">全画面</button><button onclick="restartVideo()">動画再開</button>';document.body.appendChild(o);window.onmessage=e=>{if(e.data&&e.data.type==="sagulife-slide")setSlide(e.data.slide,"remote")};if(ch)ch.onmessage=e=>{if(e.data&&e.data.type==="sagulife-slide")setSlide(e.data.slide,"remote")};window.addEventListener("storage",e=>{if(e.key==="sagulife-sync-v6"&&e.newValue){try{let m=JSON.parse(e.newValue);if(m.type==="sagulife-slide")setSlide(m.slide,"remote")}catch(_){}}});initMediaDetection();setSlide(cur,"remote")}
 document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key===" "||e.key==="PageDown"){e.preventDefault();setSlide(cur+1)}if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();setSlide(cur-1)}if(/^[1-9]$/.test(e.key))setSlide(parseInt(e.key,10)-1);if(e.key.toLowerCase()==="r")restartVideo();if(e.key.toLowerCase()==="f"&&isAud)fs()});
 isAud?audience():presenter();
 </script>
 </body>
 </html>
-
-const params=new URLSearchParams(location.search),isAud=params.get("view")==="audience";
-let cur=parseInt(location.hash.replace("#s",""),10);if(isNaN(cur)||cur<0||cur>=slides.length)cur=0;
-let aud=null,start=Date.now();const ch=("BroadcastChannel"in window)?new BroadcastChannel("sagulife-sync-v2"):null;
-
-function tagsHtml(s){return (s.tags||[]).map(t=>`<span class="fallbackTag">${t}</span>`).join("")}
-function media(s,i){let a=i===cur?" active":"";return`<div class="media use-image${a}" data-i="${i}"><img data-img="${i}" src="${s.image}?v=20260520" alt="${s.title}" loading="eager" decoding="async"><video data-v="${i}" src="${s.video}?v=20260520" poster="${s.image}?v=20260520" muted playsinline preload="metadata" loop></video><div class="fallback"><div class="fallbackInner"><div class="fallbackKicker">SAGULIFE PRESENTATION</div><div class="fallbackTitle">${s.fallbackTitle}</div><div class="fallbackSub">${s.fallbackSub}</div><div class="fallbackTags">${tagsHtml(s)}</div></div></div><div class="shade"></div></div>`}
-function stage(){return`<div class="stage"><div class="progressTrack"><div class="progress"></div></div>${slides.map(media).join("")}<div class="hud"><div class="logo">SAGULIFE</div><div>CLIENT PRESENTATION<br>WITH PRESENTER NOTES</div></div><div class="vflag">VIDEO / AUTO DETECTED</div><div class="counter">01 / ${String(slides.length).padStart(2,"0")}</div><div class="vctrl"><button onclick="restartVideo()">動画を最初から</button><button onclick="toggleVideo()">停止/再生</button></div></div>`}
-
-function initMediaDetection(){
-  document.querySelectorAll("img[data-img]").forEach(img=>{
-    const i=parseInt(img.dataset.img,10), s=slides[i];
-    const markLoaded=()=>{s.imageOk=true;updateMediaClasses();updateCueMediaLabels();};
-    const markError=()=>{s.imageOk=false;s.checked=true;updateMediaClasses();updateCueMediaLabels();};
-    img.addEventListener("load",markLoaded,{once:true});
-    img.addEventListener("error",markError,{once:true});
-    // 重要：ブラウザキャッシュやVercel配信で、listener登録前に画像が読み込み済みになることがある。
-    // その場合 load イベントが発火しないため、complete/naturalWidth で即時判定する。
-    if(img.complete){
-      if(img.naturalWidth>0) markLoaded();
-      else markError();
-    }
-  });
-  document.querySelectorAll("video[data-v]").forEach(v=>{
-    const i=parseInt(v.dataset.v,10), s=slides[i];
-    const markVideo=()=>{s.hasVideo=true;s.checked=true;updateMediaClasses();if(i===cur)playCurrentVideo();updateCueMediaLabels();};
-    const markNoVideo=()=>{s.hasVideo=false;s.checked=true;updateMediaClasses();updateCueMediaLabels();};
-    v.addEventListener("loadedmetadata",markVideo,{once:true});
-    v.addEventListener("error",markNoVideo,{once:true});
-    // 既にmetadataが読まれている場合の即時判定
-    if(v.readyState>=1) markVideo();
-    try{v.load()}catch(e){}
-  });
-}
-function updateMediaClasses(){
-  document.querySelectorAll(".media").forEach((m,i)=>{
-    const active=i===cur, useVideo=active&&slides[i].hasVideo, useImage=active&&!useVideo&&slides[i].imageOk, useFallback=active&&!useVideo&&!slides[i].imageOk;
-    m.classList.toggle("active",active);m.classList.toggle("use-video",useVideo);m.classList.toggle("use-image",useImage);m.classList.toggle("use-fallback",useFallback);
-  });
-  document.querySelectorAll(".vflag").forEach(f=>f.classList.toggle("on",slides[cur]&&slides[cur].hasVideo));
-}
-function setSlide(n,src="local"){
-  if(n<0||n>=slides.length)return;cur=n;updateMediaClasses();
-  document.querySelectorAll(".progress").forEach(p=>p.style.width=((cur+1)/slides.length*100)+"%");
-  document.querySelectorAll(".counter").forEach(c=>c.textContent=String(cur+1).padStart(2,"0")+" / "+String(slides.length).padStart(2,"0"));
-  document.querySelectorAll(".cue").forEach((c,i)=>c.classList.toggle("active",i===cur));
-  resetVideos();let ac=document.querySelector(".cue.active");if(ac&&src==="local")ac.scrollIntoView({block:"center",behavior:"smooth"});
-  history.replaceState(null,"","#s"+cur);if(!isAud&&src!=="remote")sync();
-}
-function resetVideos(){document.querySelectorAll("video").forEach(v=>{let i=parseInt(v.dataset.v,10);try{if(i===cur&&slides[i].hasVideo){v.pause();v.currentTime=0;let p=v.play();if(p&&p.catch)p.catch(()=>{})}else{v.pause();v.currentTime=0}}catch(e){}})}
-function playCurrentVideo(){document.querySelectorAll(`video[data-v="${cur}"]`).forEach(v=>{try{let p=v.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}})}
-function restartVideo(){document.querySelectorAll(`video[data-v="${cur}"]`).forEach(v=>{try{v.pause();v.currentTime=0;v.play()}catch(e){}})}
-function toggleVideo(){document.querySelectorAll(`video[data-v="${cur}"]`).forEach(v=>{v.paused?v.play():v.pause()})}
-function sync(){let m={type:"sagulife-slide",slide:cur,at:Date.now()};if(aud&&!aud.closed)aud.postMessage(m,"*");if(ch)ch.postMessage(m);try{localStorage.setItem("sagulife-sync-v2",JSON.stringify(m))}catch(e){}}
-function openAud(){let u=new URL(location.href);u.searchParams.set("view","audience");u.hash="s"+cur;aud=window.open(u.toString(),"SAGULIFE_AUDIENCE","popup=yes,width=1440,height=900");setTimeout(sync,300);let st=document.getElementById("audStatus");if(st)st.innerHTML=aud?"顧客表示：<b>別ウィンドウ起動済み。この別ウィンドウだけ共有。</b>":"顧客表示：<b>ポップアップがブロックされています。</b>"}
-function fs(){if(!document.fullscreenElement&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen();else if(document.exitFullscreen)document.exitFullscreen()}
-function mediaStatusText(i){if(slides[i].hasVideo)return"VIDEO DETECTED / MP4自動再生";if(slides[i].imageOk)return"IMAGE SLIDE / PNG表示";return"FALLBACK SLIDE / assets未検出"}
-function updateCueMediaLabels(){document.querySelectorAll(".mediaType").forEach((el,i)=>el.textContent=mediaStatusText(i))}
-function presenter(){document.getElementById("app").innerHTML=`<div class="presenter"><div class="previewPane"><div class="notice">発表者ビュー：この画面は共有しない</div><div class="previewShell">${stage()}</div></div><aside class="panel"><div class="head"><h1>SAGULIFE 台本操作型プレゼン</h1><p>GitHub→Vercel対応。assets/slideXX.png があれば表示。MP4があれば自動で動画再生。</p></div><div class="warn">⚠ この画面を共有すると台本が見えます。「顧客表示を開く」で開いた別ウィンドウだけ共有してください。</div><div class="controls"><button class="primary" id="open">顧客表示を開く</button><button id="full">全画面</button></div><div class="controls"><button id="prev">← 前へ</button><button id="next">次へ →</button></div><div class="controls"><button id="rv">動画を最初から</button><button id="copy">質問をコピー</button></div><div class="status"><div id="audStatus">顧客表示：<b>未起動</b></div><div>経過時間：<b class="timer" id="timer">00:00</b></div><div>操作：Space / → 次へ、← 前へ、1〜9 指定、R 動画再開</div><div>画像配置：<b>assets/slide00.png, slide02.png, slideSpecial.png, slide01.png, slide02a.png, slide03.png〜slide08.png</b></div></div><div class="cues">${slides.map((s,i)=>`<article class="cue" data-i="${i}"><div class="cueTop"><div><div class="cueNo">${String(i+1).padStart(2,"0")} / ${s.base}</div><div class="cueTitle">${s.title}</div></div><span class="badge">${String(i+1).padStart(2,"0")}</span></div><div class="mediaType">${mediaStatusText(i)}</div><div class="sec"><div class="lab">一言目</div><div class="txt strong">${s.first}</div></div><div class="sec"><div class="lab">補足説明</div><div class="txt">${s.talk}</div></div><div class="sec"><div class="lab">押さえるポイント</div><div class="tiny">${s.point}</div></div><div class="sec"><div class="lab">相手に投げる質問</div><div class="txt ask">${s.ask}</div></div></article>`).join("")}</div></aside></div>`;
-  document.querySelectorAll(".cue").forEach(c=>c.onclick=()=>setSlide(parseInt(c.dataset.i,10)));
-  document.getElementById("open").onclick=openAud;document.getElementById("full").onclick=fs;document.getElementById("prev").onclick=()=>setSlide(cur-1);document.getElementById("next").onclick=()=>setSlide(cur+1);document.getElementById("rv").onclick=restartVideo;document.getElementById("copy").onclick=async()=>{try{await navigator.clipboard.writeText(slides[cur].ask)}catch(e){alert(slides[cur].ask)}};
-  setInterval(()=>{let sec=Math.floor((Date.now()-start)/1000),m=String(Math.floor(sec/60)).padStart(2,"0"),s=String(sec%60).padStart(2,"0"),t=document.getElementById("timer");if(t)t.textContent=`${m}:${s}`},500);
-  initMediaDetection();setSlide(cur,"remote");
-}
-function audience(){document.getElementById("app").innerHTML=stage();let o=document.createElement("div");o.className="audOverlay";o.innerHTML='<button onclick="fs()">全画面</button><button onclick="restartVideo()">動画再開</button>';document.body.appendChild(o);window.onmessage=e=>{if(e.data&&e.data.type==="sagulife-slide")setSlide(e.data.slide,"remote")};if(ch)ch.onmessage=e=>{if(e.data&&e.data.type==="sagulife-slide")setSlide(e.data.slide,"remote")};window.addEventListener("storage",e=>{if(e.key==="sagulife-sync-v2"&&e.newValue){try{let m=JSON.parse(e.newValue);if(m.type==="sagulife-slide")setSlide(m.slide,"remote")}catch(_){}}});initMediaDetection();setSlide(cur,"remote")}
-document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key===" "||e.key==="PageDown"){e.preventDefault();setSlide(cur+1)}if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();setSlide(cur-1)}if(/^[1-9]$/.test(e.key))setSlide(parseInt(e.key,10)-1);if(e.key.toLowerCase()==="r")restartVideo();if(e.key.toLowerCase()==="f"&&isAud)fs()});
-isAud?audience():presenter();
-</script>
-</body>
-</html>
-
