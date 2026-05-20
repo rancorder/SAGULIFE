@@ -130,16 +130,6 @@ const slides=[
     "ask": "この実績があれば、御社の取引顧客に対して補完先として説明しやすい領域はありますか？"
   },
   {
-    "base": "page03",
-    "title": "10 特殊加工",
-    "headline": "他社にできない特殊加工が、提案の幅を広げます",
-    "sub": "例：ジップまたぎプリント。通常の名入れでは対応しにくい仕様も相談可能",
-    "first": "特に、提案の幅を広げやすいのが特殊加工です。通常仕様では弱い案件に、もう一段提案できる受け皿として使える可能性があります。",
-    "talk": "「何でもできます」ではなく、通常の名入れや定番ノベルティでは表現しづらい案件に対して、特殊加工という追加提案の余地があることを示します。ジップまたぎプリント、ジルコニアストーン、特殊刺繍など、既存先では断りやすい仕様に入れる可能性があります。",
-    "point": "特殊加工は、既存外注先との差し替えではなく、既存先で拾いきれない加工案件の補完材料。",
-    "ask": "過去に、加工仕様が理由で受けにくかった相談はありましたか？"
-  },
-  {
     "base": "page07",
     "title": "11 SAGULIFEの対応力で、受け皿を広げられるかもしれません",
     "headline": "SAGULIFEの対応力で、受け皿を広げられるかもしれません",
@@ -148,6 +138,16 @@ const slides=[
     "talk": "最後にSAGULIFEを解決策として置きます。ただし「任せてください」ではなく、「活用できる可能性がある」と控えめにします。実績・品質・納期対応の裏付けがある前提で、御社がこれまで見送っていた案件に、SAGULIFE様が補完先として入れるかを確認したいです。",
     "point": "SAGULIFEを補完ラインとして位置づける。置き換えではなく、受け皿拡大。",
     "ask": "御社の既存ラインを活かしたまま、補完ラインがあると受けやすくなる案件はありますか？"
+  },
+  {
+    "base": "page03",
+    "title": "10 特殊加工",
+    "headline": "他社にできない特殊加工が、提案の幅を広げます",
+    "sub": "例：ジップまたぎプリント。通常の名入れでは対応しにくい仕様も相談可能",
+    "first": "特に、提案の幅を広げやすいのが特殊加工です。通常仕様では弱い案件に、もう一段提案できる受け皿として使える可能性があります。",
+    "talk": "「何でもできます」ではなく、通常の名入れや定番ノベルティでは表現しづらい案件に対して、特殊加工という追加提案の余地があることを示します。ジップまたぎプリント、ジルコニアストーン、特殊刺繍など、既存先では断りやすい仕様に入れる可能性があります。",
+    "point": "特殊加工は、既存外注先との差し替えではなく、既存先で拾いきれない加工案件の補完材料。",
+    "ask": "過去に、加工仕様が理由で受けにくかった相談はありましたか？"
   }
 ].map(s=>({...s,image:`assets/${s.base}.png`,video:`assets/${s.base}.mp4`,hasVideo:false,checked:false,imageOk:false,imageFailed:false}));
 
@@ -205,7 +205,7 @@ function openAud(){let u=new URL(location.href);u.searchParams.set("view","audie
 function fs(){if(!document.fullscreenElement&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen();else if(document.exitFullscreen)document.exitFullscreen()}
 function mediaStatusText(i){if(slides[i].hasVideo)return"VIDEO DETECTED / MP4自動再生";if(slides[i].imageOk)return"IMAGE SLIDE / PNG表示";return"FALLBACK SLIDE / assets未検出"}
 function updateCueMediaLabels(){document.querySelectorAll(".mediaType").forEach((el,i)=>el.textContent=mediaStatusText(i))}
-function presenter(){document.getElementById("app").innerHTML=`<div class="presenter"><div class="previewPane"><div class="notice">発表者ビュー：この画面は共有しない</div><div class="previewShell">${stage()}</div></div><aside class="panel"><div class="head"><h1>SAGULIFE 台本操作型プレゼン v8</h1><p>GitHub→Vercel対応。assets/pageXX.png があれば表示。MP4があれば自動で動画再生。</p></div><div class="warn">⚠ この画面を共有すると台本が見えます。「顧客表示を開く」で開いた別ウィンドウだけ共有してください。</div><div class="controls"><button class="primary" id="open">顧客表示を開く</button><button id="full">全画面</button></div><div class="controls"><button id="prev">← 前へ</button><button id="next">次へ →</button></div><div class="controls"><button id="rv">動画を最初から</button><button id="copy">質問をコピー</button></div><div class="status"><div id="audStatus">顧客表示：<b>未起動</b></div><div>経過時間：<b class="timer" id="timer">00:00</b></div><div>操作：Space / → 次へ、← 前へ、1〜9 指定、R 動画再開</div><div>画像配置：<b>固定マニフェスト方式：page01 → page04 → page05 → page06 → page08 → page09 → page10 → page11 → page02 → page13 → page03 → page07</b></div></div><div class="cues">${slides.map((s,i)=>`<article class="cue" data-i="${i}"><div class="cueTop"><div><div class="cueNo">${String(i+1).padStart(2,"0")} / ${s.base}</div><div class="cueTitle">${s.title}</div></div><span class="badge">${String(i+1).padStart(2,"0")}</span></div><div class="mediaType">${mediaStatusText(i)}</div><div class="sec"><div class="lab">一言目</div><div class="txt strong">${s.first}</div></div><div class="sec"><div class="lab">補足説明</div><div class="txt">${s.talk}</div></div><div class="sec"><div class="lab">押さえるポイント</div><div class="tiny">${s.point}</div></div><div class="sec"><div class="lab">相手に投げる質問</div><div class="txt ask">${s.ask}</div></div></article>`).join("")}</div></aside></div>`;document.querySelectorAll(".cue").forEach(c=>c.onclick=()=>setSlide(parseInt(c.dataset.i,10)));document.getElementById("open").onclick=openAud;document.getElementById("full").onclick=fs;document.getElementById("prev").onclick=()=>setSlide(cur-1);document.getElementById("next").onclick=()=>setSlide(cur+1);document.getElementById("rv").onclick=restartVideo;document.getElementById("copy").onclick=async()=>{try{await navigator.clipboard.writeText(slides[cur].ask)}catch(e){alert(slides[cur].ask)}};setInterval(()=>{let sec=Math.floor((Date.now()-start)/1000),m=String(Math.floor(sec/60)).padStart(2,"0"),s=String(sec%60).padStart(2,"0"),t=document.getElementById("timer");if(t)t.textContent=`${m}:${s}`},500);initMediaDetection();setSlide(cur,"remote");}
+function presenter(){document.getElementById("app").innerHTML=`<div class="presenter"><div class="previewPane"><div class="notice">発表者ビュー：この画面は共有しない</div><div class="previewShell">${stage()}</div></div><aside class="panel"><div class="head"><h1>SAGULIFE 台本操作型プレゼン v9</h1><p>GitHub→Vercel対応。assets/pageXX.png があれば表示。MP4があれば自動で動画再生。</p></div><div class="warn">⚠ この画面を共有すると台本が見えます。「顧客表示を開く」で開いた別ウィンドウだけ共有してください。</div><div class="controls"><button class="primary" id="open">顧客表示を開く</button><button id="full">全画面</button></div><div class="controls"><button id="prev">← 前へ</button><button id="next">次へ →</button></div><div class="controls"><button id="rv">動画を最初から</button><button id="copy">質問をコピー</button></div><div class="status"><div id="audStatus">顧客表示：<b>未起動</b></div><div>経過時間：<b class="timer" id="timer">00:00</b></div><div>操作：Space / → 次へ、← 前へ、1〜9 指定、R 動画再開</div><div>画像配置：<b>固定マニフェスト方式：page01 → page04 → page05 → page06 → page08 → page09 → page10 → page11 → page02 → page13 → page07 → page03</b></div></div><div class="cues">${slides.map((s,i)=>`<article class="cue" data-i="${i}"><div class="cueTop"><div><div class="cueNo">${String(i+1).padStart(2,"0")} / ${s.base}</div><div class="cueTitle">${s.title}</div></div><span class="badge">${String(i+1).padStart(2,"0")}</span></div><div class="mediaType">${mediaStatusText(i)}</div><div class="sec"><div class="lab">一言目</div><div class="txt strong">${s.first}</div></div><div class="sec"><div class="lab">補足説明</div><div class="txt">${s.talk}</div></div><div class="sec"><div class="lab">押さえるポイント</div><div class="tiny">${s.point}</div></div><div class="sec"><div class="lab">相手に投げる質問</div><div class="txt ask">${s.ask}</div></div></article>`).join("")}</div></aside></div>`;document.querySelectorAll(".cue").forEach(c=>c.onclick=()=>setSlide(parseInt(c.dataset.i,10)));document.getElementById("open").onclick=openAud;document.getElementById("full").onclick=fs;document.getElementById("prev").onclick=()=>setSlide(cur-1);document.getElementById("next").onclick=()=>setSlide(cur+1);document.getElementById("rv").onclick=restartVideo;document.getElementById("copy").onclick=async()=>{try{await navigator.clipboard.writeText(slides[cur].ask)}catch(e){alert(slides[cur].ask)}};setInterval(()=>{let sec=Math.floor((Date.now()-start)/1000),m=String(Math.floor(sec/60)).padStart(2,"0"),s=String(sec%60).padStart(2,"0"),t=document.getElementById("timer");if(t)t.textContent=`${m}:${s}`},500);initMediaDetection();setSlide(cur,"remote");}
 function audience(){document.getElementById("app").innerHTML=stage();let o=document.createElement("div");o.className="audOverlay";o.innerHTML='<button onclick="fs()">全画面</button><button onclick="restartVideo()">動画再開</button>';document.body.appendChild(o);window.onmessage=e=>{if(e.data&&e.data.type==="sagulife-slide")setSlide(e.data.slide,"remote")};if(ch)ch.onmessage=e=>{if(e.data&&e.data.type==="sagulife-slide")setSlide(e.data.slide,"remote")};window.addEventListener("storage",e=>{if(e.key==="sagulife-sync-v6"&&e.newValue){try{let m=JSON.parse(e.newValue);if(m.type==="sagulife-slide")setSlide(m.slide,"remote")}catch(_){}}});initMediaDetection();setSlide(cur,"remote")}
 document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key===" "||e.key==="PageDown"){e.preventDefault();setSlide(cur+1)}if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();setSlide(cur-1)}if(/^[1-9]$/.test(e.key))setSlide(parseInt(e.key,10)-1);if(e.key.toLowerCase()==="r")restartVideo();if(e.key.toLowerCase()==="f"&&isAud)fs()});
 isAud?audience():presenter();
