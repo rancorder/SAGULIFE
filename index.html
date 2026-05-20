@@ -159,15 +159,51 @@ const slides=[
     "point": "次アクションは候補案件の共有。小さく始める。",
     "ask": "まず1件、過去に条件が合わず見送った相談内容を共有いただくことは可能ですか？"
   }
-].map(s=>({...s,image:`assets/${s.base}.png`,video:`assets/${s.base}.mp4`,hasVideo:false,checked:false,imageOk:false}));
+].map(s=>({...s,image:`assets/${s.base}.png`,video:`assets/${s.base}.mp4`,hasVideo:false,checked:false,imageOk:false,imageFailed:false}));
 const params=new URLSearchParams(location.search),isAud=params.get("view")==="audience";
 let cur=parseInt(location.hash.replace("#s",""),10);if(isNaN(cur)||cur<0||cur>=slides.length)cur=0;
 let aud=null,start=Date.now();const ch=("BroadcastChannel"in window)?new BroadcastChannel("sagulife-sync-v3"):null;
 function tagsHtml(s){return (s.tags||[]).map(t=>`<span class="fallbackTag">${t}</span>`).join("")}
-function media(s,i){let a=i===cur?" active":"";return`<div class="media use-image${a}" data-i="${i}"><img data-img="${i}" src="${s.image}" alt="${s.title}"><video data-v="${i}" src="${s.video}" poster="${s.image}" muted playsinline preload="metadata" loop></video><div class="fallback"><div class="fallbackInner"><div class="fallbackKicker">SAGULIFE PRESENTATION</div><div class="fallbackTitle">${s.headline}</div><div class="fallbackSub">${s.sub}</div><div class="fallbackTags">${tagsHtml(s)}</div></div></div><div class="shade"></div></div>`}
+function media(s,i){let a=i===cur?" active":"";return`<div class="media use-image${a}" data-i="${i}"><img data-img="${i}" src="${s.image}" alt="${s.title}" loading="eager" decoding="async" fetchpriority="high"><video data-v="${i}" src="${s.video}" poster="${s.image}" muted playsinline preload="metadata" loop></video><div class="fallback"><div class="fallbackInner"><div class="fallbackKicker">SAGULIFE PRESENTATION</div><div class="fallbackTitle">${s.headline}</div><div class="fallbackSub">${s.sub}</div><div class="fallbackTags">${tagsHtml(s)}</div></div></div><div class="shade"></div></div>`}
 function stage(){return`<div class="stage"><div class="progressTrack"><div class="progress"></div></div>${slides.map(media).join("")}<div class="vflag">VIDEO / AUTO DETECTED</div><div class="counter">01 / ${String(slides.length).padStart(2,"0")}</div><div class="vctrl"><button onclick="restartVideo()">動画を最初から</button><button onclick="toggleVideo()">停止/再生</button></div></div>`}
-function initMediaDetection(){document.querySelectorAll("img[data-img]").forEach(img=>{const i=parseInt(img.dataset.img,10),s=slides[i];img.addEventListener("load",()=>{s.imageOk=true;updateMediaClasses();updateCueMediaLabels();},{once:true});img.addEventListener("error",()=>{s.imageOk=false;updateMediaClasses();updateCueMediaLabels();},{once:true});});document.querySelectorAll("video[data-v]").forEach(v=>{const i=parseInt(v.dataset.v,10),s=slides[i];v.addEventListener("loadedmetadata",()=>{s.hasVideo=true;s.checked=true;updateMediaClasses();if(i===cur)playCurrentVideo();updateCueMediaLabels();},{once:true});v.addEventListener("error",()=>{s.hasVideo=false;s.checked=true;updateMediaClasses();updateCueMediaLabels();},{once:true});try{v.load()}catch(e){}})}
-function updateMediaClasses(){document.querySelectorAll(".media").forEach((m,i)=>{const active=i===cur,useVideo=active&&slides[i].hasVideo,useImage=active&&!useVideo&&slides[i].imageOk,useFallback=active&&!useVideo&&!slides[i].imageOk;m.classList.toggle("active",active);m.classList.toggle("use-video",useVideo);m.classList.toggle("use-image",useImage);m.classList.toggle("use-fallback",useFallback);});document.querySelectorAll(".vflag").forEach(f=>f.classList.toggle("on",slides[cur]&&slides[cur].hasVideo));}
+function initMediaDetection(){
+  document.querySelectorAll("img[data-img]").forEach(img=>{
+    const i=parseInt(img.dataset.img,10),s=slides[i];
+    const ok=()=>{s.imageOk=true;s.imageFailed=false;updateMediaClasses();updateCueMediaLabels();};
+    const ng=()=>{s.imageOk=false;s.imageFailed=true;updateMediaClasses();updateCueMediaLabels();};
+    img.addEventListener("load",ok,{once:true});
+    img.addEventListener("error",ng,{once:true});
+    // 画像がキャッシュ済みの場合、loadイベントが拾えないことがあるため即時判定
+    if(img.complete){
+      if(img.naturalWidth>0) ok();
+      else if(img.naturalWidth===0) ng();
+    }
+  });
+  document.querySelectorAll("video[data-v]").forEach(v=>{
+    const i=parseInt(v.dataset.v,10),s=slides[i];
+    const ok=()=>{s.hasVideo=true;s.checked=true;updateMediaClasses();if(i===cur)playCurrentVideo();updateCueMediaLabels();};
+    const ng=()=>{s.hasVideo=false;s.checked=true;updateMediaClasses();updateCueMediaLabels();};
+    v.addEventListener("loadedmetadata",ok,{once:true});
+    v.addEventListener("error",ng,{once:true});
+    if(v.readyState>=1) ok();
+    try{v.load()}catch(e){}
+  });
+}
+function updateMediaClasses(){
+  document.querySelectorAll(".media").forEach((m,i)=>{
+    const active=i===cur;
+    const useVideo=active&&slides[i].hasVideo;
+    // 初期状態ではfallbackに落とさず、まず画像を表示させに行く。
+    // 画像エラーが確定した時だけfallbackを出す。
+    const useFallback=active&&!useVideo&&slides[i].imageFailed;
+    const useImage=active&&!useVideo&&!useFallback;
+    m.classList.toggle("active",active);
+    m.classList.toggle("use-video",useVideo);
+    m.classList.toggle("use-image",useImage);
+    m.classList.toggle("use-fallback",useFallback);
+  });
+  document.querySelectorAll(".vflag").forEach(f=>f.classList.toggle("on",slides[cur]&&slides[cur].hasVideo));
+}
 function setSlide(n,src="local"){if(n<0||n>=slides.length)return;cur=n;updateMediaClasses();document.querySelectorAll(".progress").forEach(p=>p.style.width=((cur+1)/slides.length*100)+"%");document.querySelectorAll(".counter").forEach(c=>c.textContent=String(cur+1).padStart(2,"0")+" / "+String(slides.length).padStart(2,"0"));document.querySelectorAll(".cue").forEach((c,i)=>c.classList.toggle("active",i===cur));resetVideos();let ac=document.querySelector(".cue.active");if(ac&&src==="local")ac.scrollIntoView({block:"center",behavior:"smooth"});history.replaceState(null,"","#s"+cur);if(!isAud&&src!=="remote")sync();}
 function resetVideos(){document.querySelectorAll("video").forEach(v=>{let i=parseInt(v.dataset.v,10);try{if(i===cur&&slides[i].hasVideo){v.pause();v.currentTime=0;let p=v.play();if(p&&p.catch)p.catch(()=>{})}else{v.pause();v.currentTime=0}}catch(e){}})}
 function playCurrentVideo(){document.querySelectorAll(`video[data-v="${cur}"]`).forEach(v=>{try{let p=v.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}})}
