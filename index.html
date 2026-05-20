@@ -40,16 +40,6 @@ const slides=[
     "ask": "本日は、過去に受けたかったけれど受けにくかった案件があるか、そこから確認させてください。"
   },
   {
-    "base": "page12",
-    "title": "基本商流の整理",
-    "headline": "基本商流の整理",
-    "sub": "一般顧客 → ノベルティ製作会社・代理店 → 協力会社。SAGULIFEは裏側の補完ラインとして入る想定です。",
-    "first": "まず前提として、今回の商流はSAGULIFEが一般顧客へ直接売る形ではなく、ノベルティ製作会社様・代理店様の裏側で協力会社として入る形です。",
-    "talk": "ノベルティ製作会社様・代理店様には、すでに付き合いのある依頼先があります。そのため、既存先で問題なく回っている領域を奪いにいくのではなく、既存依頼先で拾いきれない案件に補完ラインとして入る設計です。",
-    "point": "ここで商流を必ず定義する。一般顧客向け資料ではなく、制作会社・代理店向けの補完ライン資料であることを明確にする。",
-    "ask": "御社では、既存の協力会社様で回っている領域と、相談先に迷う領域は分かれていますか？"
-  },
-  {
     "base": "page04",
     "title": "01 過去に断った案件、まだ売上に変えられるかもしれません",
     "headline": "過去に断った案件、まだ売上に変えられるかもしれません",
@@ -131,13 +121,13 @@ const slides=[
   },
   {
     "base": "page13",
-    "title": "09 SAGULIFEの実績と、補完先としての信頼材料",
-    "headline": "SAGULIFEの実績と、補完先としての信頼材料",
-    "sub": "ホリプロ様・UUUM様、有名クリエイター関連グッズ、短納期・特殊加工・POPUP実績を判断材料として提示します",
-    "first": "ここは、SAGULIFE様を既存外注先に追加できる候補かどうかをご判断いただくための材料です。",
-    "talk": "ホリプロ様、UUUM様などの制作実績に加えて、東海オンエア様など有名クリエイター関連グッズの対応実績があります。また、白Tシャツ印刷で最短3日納品の実績、小ロット対応、短納期、特殊加工、POPUP支援まで含めると、既存の依頼先では拾いにくい案件を補完できる余地があります。会社紹介ではなく、どの領域なら任せられそうかの判断材料として見ていただきます。",
-    "point": "実績は“すごい会社紹介”ではなく、補完先として任せられるかの証拠として使う。ウエスト様ではなくUUUM様に修正済み。",
-    "ask": "こういった実績や対応範囲を前提にすると、御社で今の依頼先だけでは受けにくい案件に近いものはありますか？"
+    "title": "09 SAGULIFEの実績",
+    "headline": "SAGULIFEの実績",
+    "sub": "ホリプロ様・UUUM様・東海オンエア様など、取引顧客への提案時に使える判断材料です。",
+    "first": "ここは、SAGULIFE様の実績です。御社の取引顧客に対して、補完先として提案できるかを判断いただく材料になります。",
+    "talk": "ホリプロ様、UUUM様などの制作実績に加えて、東海オンエア様など有名クリエイター関連グッズの対応実績があります。ここで言いたいのは、SAGULIFEがすごい会社という話ではなく、御社が取引顧客へ提案する際に、実績面で説明しやすい補完先かどうかという点です。",
+    "point": "タイトルは“SAGULIFEの実績”のみにする。実績は会社紹介ではなく、取引顧客への説明材料として扱う。",
+    "ask": "この実績があれば、御社の取引顧客に対して補完先として説明しやすい領域はありますか？"
   },
   {
     "base": "page03",
@@ -215,7 +205,7 @@ function openAud(){let u=new URL(location.href);u.searchParams.set("view","audie
 function fs(){if(!document.fullscreenElement&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen();else if(document.exitFullscreen)document.exitFullscreen()}
 function mediaStatusText(i){if(slides[i].hasVideo)return"VIDEO DETECTED / MP4自動再生";if(slides[i].imageOk)return"IMAGE SLIDE / PNG表示";return"FALLBACK SLIDE / assets未検出"}
 function updateCueMediaLabels(){document.querySelectorAll(".mediaType").forEach((el,i)=>el.textContent=mediaStatusText(i))}
-function presenter(){document.getElementById("app").innerHTML=`<div class="presenter"><div class="previewPane"><div class="notice">発表者ビュー：この画面は共有しない</div><div class="previewShell">${stage()}</div></div><aside class="panel"><div class="head"><h1>SAGULIFE 台本操作型プレゼン v6</h1><p>GitHub→Vercel対応。assets/pageXX.png があれば表示。MP4があれば自動で動画再生。</p></div><div class="warn">⚠ この画面を共有すると台本が見えます。「顧客表示を開く」で開いた別ウィンドウだけ共有してください。</div><div class="controls"><button class="primary" id="open">顧客表示を開く</button><button id="full">全画面</button></div><div class="controls"><button id="prev">← 前へ</button><button id="next">次へ →</button></div><div class="controls"><button id="rv">動画を最初から</button><button id="copy">質問をコピー</button></div><div class="status"><div id="audStatus">顧客表示：<b>未起動</b></div><div>経過時間：<b class="timer" id="timer">00:00</b></div><div>操作：Space / → 次へ、← 前へ、1〜9 指定、R 動画再開</div><div>画像配置：<b>固定マニフェスト方式：page01 → page04 → page05 → page06 → page08 → page09 → page10 → page11 → page02 → page03 → page07</b></div></div><div class="cues">${slides.map((s,i)=>`<article class="cue" data-i="${i}"><div class="cueTop"><div><div class="cueNo">${String(i+1).padStart(2,"0")} / ${s.base}</div><div class="cueTitle">${s.title}</div></div><span class="badge">${String(i+1).padStart(2,"0")}</span></div><div class="mediaType">${mediaStatusText(i)}</div><div class="sec"><div class="lab">一言目</div><div class="txt strong">${s.first}</div></div><div class="sec"><div class="lab">補足説明</div><div class="txt">${s.talk}</div></div><div class="sec"><div class="lab">押さえるポイント</div><div class="tiny">${s.point}</div></div><div class="sec"><div class="lab">相手に投げる質問</div><div class="txt ask">${s.ask}</div></div></article>`).join("")}</div></aside></div>`;document.querySelectorAll(".cue").forEach(c=>c.onclick=()=>setSlide(parseInt(c.dataset.i,10)));document.getElementById("open").onclick=openAud;document.getElementById("full").onclick=fs;document.getElementById("prev").onclick=()=>setSlide(cur-1);document.getElementById("next").onclick=()=>setSlide(cur+1);document.getElementById("rv").onclick=restartVideo;document.getElementById("copy").onclick=async()=>{try{await navigator.clipboard.writeText(slides[cur].ask)}catch(e){alert(slides[cur].ask)}};setInterval(()=>{let sec=Math.floor((Date.now()-start)/1000),m=String(Math.floor(sec/60)).padStart(2,"0"),s=String(sec%60).padStart(2,"0"),t=document.getElementById("timer");if(t)t.textContent=`${m}:${s}`},500);initMediaDetection();setSlide(cur,"remote");}
+function presenter(){document.getElementById("app").innerHTML=`<div class="presenter"><div class="previewPane"><div class="notice">発表者ビュー：この画面は共有しない</div><div class="previewShell">${stage()}</div></div><aside class="panel"><div class="head"><h1>SAGULIFE 台本操作型プレゼン v8</h1><p>GitHub→Vercel対応。assets/pageXX.png があれば表示。MP4があれば自動で動画再生。</p></div><div class="warn">⚠ この画面を共有すると台本が見えます。「顧客表示を開く」で開いた別ウィンドウだけ共有してください。</div><div class="controls"><button class="primary" id="open">顧客表示を開く</button><button id="full">全画面</button></div><div class="controls"><button id="prev">← 前へ</button><button id="next">次へ →</button></div><div class="controls"><button id="rv">動画を最初から</button><button id="copy">質問をコピー</button></div><div class="status"><div id="audStatus">顧客表示：<b>未起動</b></div><div>経過時間：<b class="timer" id="timer">00:00</b></div><div>操作：Space / → 次へ、← 前へ、1〜9 指定、R 動画再開</div><div>画像配置：<b>固定マニフェスト方式：page01 → page04 → page05 → page06 → page08 → page09 → page10 → page11 → page02 → page13 → page03 → page07</b></div></div><div class="cues">${slides.map((s,i)=>`<article class="cue" data-i="${i}"><div class="cueTop"><div><div class="cueNo">${String(i+1).padStart(2,"0")} / ${s.base}</div><div class="cueTitle">${s.title}</div></div><span class="badge">${String(i+1).padStart(2,"0")}</span></div><div class="mediaType">${mediaStatusText(i)}</div><div class="sec"><div class="lab">一言目</div><div class="txt strong">${s.first}</div></div><div class="sec"><div class="lab">補足説明</div><div class="txt">${s.talk}</div></div><div class="sec"><div class="lab">押さえるポイント</div><div class="tiny">${s.point}</div></div><div class="sec"><div class="lab">相手に投げる質問</div><div class="txt ask">${s.ask}</div></div></article>`).join("")}</div></aside></div>`;document.querySelectorAll(".cue").forEach(c=>c.onclick=()=>setSlide(parseInt(c.dataset.i,10)));document.getElementById("open").onclick=openAud;document.getElementById("full").onclick=fs;document.getElementById("prev").onclick=()=>setSlide(cur-1);document.getElementById("next").onclick=()=>setSlide(cur+1);document.getElementById("rv").onclick=restartVideo;document.getElementById("copy").onclick=async()=>{try{await navigator.clipboard.writeText(slides[cur].ask)}catch(e){alert(slides[cur].ask)}};setInterval(()=>{let sec=Math.floor((Date.now()-start)/1000),m=String(Math.floor(sec/60)).padStart(2,"0"),s=String(sec%60).padStart(2,"0"),t=document.getElementById("timer");if(t)t.textContent=`${m}:${s}`},500);initMediaDetection();setSlide(cur,"remote");}
 function audience(){document.getElementById("app").innerHTML=stage();let o=document.createElement("div");o.className="audOverlay";o.innerHTML='<button onclick="fs()">全画面</button><button onclick="restartVideo()">動画再開</button>';document.body.appendChild(o);window.onmessage=e=>{if(e.data&&e.data.type==="sagulife-slide")setSlide(e.data.slide,"remote")};if(ch)ch.onmessage=e=>{if(e.data&&e.data.type==="sagulife-slide")setSlide(e.data.slide,"remote")};window.addEventListener("storage",e=>{if(e.key==="sagulife-sync-v6"&&e.newValue){try{let m=JSON.parse(e.newValue);if(m.type==="sagulife-slide")setSlide(m.slide,"remote")}catch(_){}}});initMediaDetection();setSlide(cur,"remote")}
 document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key===" "||e.key==="PageDown"){e.preventDefault();setSlide(cur+1)}if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();setSlide(cur-1)}if(/^[1-9]$/.test(e.key))setSlide(parseInt(e.key,10)-1);if(e.key.toLowerCase()==="r")restartVideo();if(e.key.toLowerCase()==="f"&&isAud)fs()});
 isAud?audience():presenter();
